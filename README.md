@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/hercules-team/augeasproviders_grub.svg?branch=master)](https://travis-ci.org/hercules-team/augeasproviders_grub)
+[![Coverage Status](https://img.shields.io/coveralls/hercules-team/augeasproviders_grub.svg)](https://coveralls.io/r/hercules-team/augeasproviders_grub?branch=master)
+
+
 # grub: type/provider for grub files for Puppet
 
 This module provides a new type/provider for Puppet to read and modify grub
