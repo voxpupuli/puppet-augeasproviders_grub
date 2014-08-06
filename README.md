@@ -1,6 +1,6 @@
-# grub: type/provider for shell files for Puppet
+# grub: type/provider for grub files for Puppet
 
-This module provides a new type/provider for Puppet to read and modify shell
+This module provides a new type/provider for Puppet to read and modify grub
 config files using the Augeas configuration library.
 
 The advantage of using Augeas over the default Puppet `parsedfile`
