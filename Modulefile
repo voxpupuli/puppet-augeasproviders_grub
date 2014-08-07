@@ -1,8 +1,0 @@
-name    'herculesteam-augeasproviders_grub'
-version '1.0.0'
-source 'git://github.com/hercules-team/augeasproviders_grub'
-author 'Dominic Cleal, Raphael Pinson'
-license 'Apache 2.0'
-summary 'Augeas-based grub types and providers for Puppet'
-description 'This module provides types/providers for grub configuration files using the Augeas configuration API library.'
-project_page 'http://augeasproviders.com'
