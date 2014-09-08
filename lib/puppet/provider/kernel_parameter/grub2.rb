@@ -19,7 +19,13 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
   end
 
   confine :feature => :augeas
+  confine :exists => target
   commands :mkconfig => mkconfig_path
+
+  # when both grub* providers match, prefer GRUB 2
+  def self.specificity
+    super + 1
+  end
 
   def self.instances
     augopen do |aug|
