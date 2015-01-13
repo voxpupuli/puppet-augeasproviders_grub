@@ -87,7 +87,14 @@ both GRUB Legacy (0.9x) and GRUB 2 configurations.
 
 Bootmode defaults to "all", so settings are applied for all boot types usually.
 
-Apply only to normal boots:
+Apply only to the default boot:
+
+    kernel_parameter { "quiet":
+      ensure   => present,
+      bootmode => "default",
+    }
+
+Apply only to normal boots. In GRUB legacy, normal boots consist of the default boot plus non-recovery ones. In GRUB2, normal bootmode is just an alias for default.
 
     kernel_parameter { "quiet":
       ensure   => present,

@@ -27,7 +27,8 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
       # Params are nicely separated, but no recovery-only setting (hard-coded)
       sections = { 'all'    => "GRUB_CMDLINE_LINUX",
-                   'normal' => "GRUB_CMDLINE_LINUX_DEFAULT" }
+                   'normal' => "GRUB_CMDLINE_LINUX_DEFAULT",
+                   'default' => "GRUB_CMDLINE_LINUX_DEFAULT" }
       sections.keys.sort.each do |bootmode|
         key = sections[bootmode]
         # Get all unique param names
@@ -52,7 +53,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
   def self.section(resource)
     case resource[:bootmode].to_s
-    when "normal"
+    when "default", "normal"
       "GRUB_CMDLINE_LINUX_DEFAULT"
     when "all"
       "GRUB_CMDLINE_LINUX"

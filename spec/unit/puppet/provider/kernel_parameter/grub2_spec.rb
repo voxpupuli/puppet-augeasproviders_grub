@@ -54,11 +54,14 @@ describe provider_class do
         }
       }
 
-      inst.size.should == 4
+      inst.size.should == 7
       inst[0].should == {:name=>"quiet", :ensure=>:present, :value=>:absent, :bootmode=>"all"}
       inst[1].should == {:name=>"elevator", :ensure=>:present, :value=>"noop", :bootmode=>"all"}
       inst[2].should == {:name=>"divider", :ensure=>:present, :value=>"10", :bootmode=>"all"}
-      inst[3].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>"normal"}
+      inst[3].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>"default"}
+      inst[4].should == {:name=>"nohz", :ensure=>:present, :value=>"on", :bootmode=>"default"}
+      inst[5].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>"normal"}
+      inst[6].should == {:name=>"nohz", :ensure=>:present, :value=>"on", :bootmode=>"normal"}
     end
 
     describe "when creating entries" do
@@ -85,6 +88,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end
@@ -109,6 +113,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end
@@ -134,6 +139,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end
@@ -157,6 +163,32 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
+            { "value" = "foo" }
+          }
+        ')
+      end
+
+      it "should create default boot-only entries" do
+        apply!(Puppet::Type.type(:kernel_parameter).new(
+          :name     => "foo",
+          :ensure   => :present,
+          :bootmode => :default,
+          :target   => target,
+          :provider => "grub2"
+        ))
+
+        augparse_filter(target, LENS, FILTER, '
+          { "GRUB_CMDLINE_LINUX"
+            { "quote" = "\"" }
+            { "value" = "quiet" }
+            { "value" = "elevator=noop" }
+            { "value" = "divider=10" }
+          }
+          { "GRUB_CMDLINE_LINUX_DEFAULT"
+            { "quote" = "\"" }
+            { "value" = "rhgb" }
+            { "value" = "nohz=on" }
             { "value" = "foo" }
           }
         ')
@@ -196,6 +228,7 @@ describe provider_class do
         { "GRUB_CMDLINE_LINUX_DEFAULT"
           { "quote" = "\"" }
           { "value" = "rhgb" }
+          { "value" = "nohz=on" }
         }
       ')
     end
@@ -225,6 +258,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end
@@ -249,6 +283,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end
@@ -276,6 +311,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
 
@@ -298,6 +334,7 @@ describe provider_class do
           { "GRUB_CMDLINE_LINUX_DEFAULT"
             { "quote" = "\"" }
             { "value" = "rhgb" }
+            { "value" = "nohz=on" }
           }
         ')
       end

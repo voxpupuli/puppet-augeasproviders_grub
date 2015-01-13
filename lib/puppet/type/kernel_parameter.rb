@@ -22,9 +22,9 @@ Puppet::Type.newtype(:kernel_parameter) do
   end
 
   newparam(:bootmode) do
-    desc "Boot mode(s) to apply the parameter to.  Either 'all' (default) to use the parameter on all boots (normal and recovery mode), 'normal' for just normal boots or 'recovery' for just recovery boots."
+    desc "Boot mode(s) to apply the parameter to.  Either 'all' (default) to use the parameter on all boots (normal and recovery mode), 'default' for just the default boot entry, 'normal' for just normal boots or 'recovery' for just recovery boots."
 
-    newvalues :all, :normal, :recovery
+    newvalues :all, :default, :normal, :recovery
 
     defaultto :all
   end
