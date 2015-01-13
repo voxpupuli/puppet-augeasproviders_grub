@@ -39,15 +39,17 @@ describe provider_class do
         }
       }
 
-      inst.size.should == 8
+      inst.size.should == 10
       inst[0].should == {:name=>"ro", :ensure=>:present, :value=>:absent, :bootmode=>:all}
       inst[1].should == {:name=>"root", :ensure=>:present, :value=>"/dev/VolGroup00/LogVol00", :bootmode=>:all}
-      inst[2].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>:normal}
-      inst[3].should == {:name=>"quiet", :ensure=>:present, :value=>:absent, :bootmode=>:normal}
+      inst[2].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>:default}
+      inst[3].should == {:name=>"quiet", :ensure=>:present, :value=>:absent, :bootmode=>:default}
       inst[4].should == {:name=>"elevator", :ensure=>:present, :value=>"noop", :bootmode=>:all}
       inst[5].should == {:name=>"divider", :ensure=>:present, :value=>"10", :bootmode=>:all}
-      inst[6].should == {:name=>"rd_LVM_LV", :ensure=>:present, :value=>["vg/lv1", "vg/lv2"], :bootmode=>:normal}
+      inst[6].should == {:name=>"rd_LVM_LV", :ensure=>:present, :value=>["vg/lv1", "vg/lv2"], :bootmode=>:default}
       inst[7].should == {:name=>"S", :ensure=>:present, :value=>:absent, :bootmode=>:recovery}
+      inst[8].should == {:name=>"splash", :ensure=>:present, :value=>:absent, :bootmode=>:normal}
+      inst[9].should == {:name=>"nohz", :ensure=>:present, :value=>"on", :bootmode=>:normal}
     end
 
     describe "when creating entries" do
@@ -128,6 +130,21 @@ describe provider_class do
           aug.match("title/kernel/rd_LVM_LV[.='vg/lv1']").size.should == 0
           aug.match("title/kernel/rd_LVM_LV[.='vg/lv2']").size.should == 0
           aug.match("title/kernel/rd_LVM_LV").map {|p| aug.get(p)}.should == ["vg/lv7"]*3
+        end
+      end
+
+      it "should create default-only entries" do
+        apply!(Puppet::Type.type(:kernel_parameter).new(
+          :name     => "foo",
+          :ensure   => :present,
+          :bootmode => :default,
+          :target   => target,
+          :provider => "grub"
+        ))
+
+        aug_open(target, "Grub.lns") do |aug|
+          aug.match("title/kernel/foo").size.should == 1
+          aug.match("title[int(../default)+1]/kernel/foo").size.should == 1
         end
       end
 

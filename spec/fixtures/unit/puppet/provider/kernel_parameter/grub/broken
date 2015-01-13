@@ -22,5 +22,5 @@ title Red Hat Enterprise Linux Server (2.6.18-308.13.1.el5) (recovery mode)
 	initrd /initrd-2.6.18-308.13.1.el5.img
 title Red Hat Enterprise Linux Server (2.6.18-194.el5)
 	root (hd0,0)
-	kernel /vmlinuz-2.6.18-194.el5 ro root=/dev/VolGroup00/LogVol00 rhgb quiet elevator=noop divider=10
+	kernel /vmlinuz-2.6.18-194.el5 ro root=/dev/VolGroup00/LogVol00 rhgb quiet elevator=noop divider=10 splash nohz=on
 	initrd /initrd-2.6.18-194.el5.img

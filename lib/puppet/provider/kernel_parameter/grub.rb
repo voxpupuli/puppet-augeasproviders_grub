@@ -1,6 +1,6 @@
 # GRUB legacy / 0.9x support for kernel parameters
 #
-# Copyright (c) 2012 Dominic Cleal
+# Copyright (c) 2013 Dominic Cleal
 # Licensed under the Apache License, Version 2.0
 
 Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
@@ -17,6 +17,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
   # Useful XPath to match only recovery entries
   MODE_RECOVERY = "(kernel/S or kernel/1 or kernel/single or .=~regexp('.*\((single-user|recovery) mode\).*'))"
   MODE_NOT_RECOVERY = "(count(kernel/S)=0 and count(kernel/1)=0 and count(kernel/single)=0 and .!~regexp('.*\((single-user|recovery) mode\).*'))"
+  MODE_DEFAULT = "int(../default)+1"
 
   def title_filter
     case resource[:bootmode]
@@ -24,6 +25,8 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
       "[#{MODE_RECOVERY}]"
     when :normal
       "[#{MODE_NOT_RECOVERY}]"
+    when :default
+      "[#{MODE_DEFAULT}]"
     else
       ""
     end
@@ -43,12 +46,15 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
         param = {:ensure => :present, :name => pp, :value => vals}
 
         # Check if this param is used in recovery entries too, irrespective of value
+        is_def = !aug.match("$target/title[#{MODE_DEFAULT}]/kernel/#{pp}").empty?
         is_recv = !aug.match("$target/title[#{MODE_RECOVERY} and kernel/#{pp}]").empty?
         is_norm = !aug.match("$target/title[#{MODE_NOT_RECOVERY} and kernel/#{pp}]").empty?
-        if is_recv && is_norm
+        if is_def && is_recv && is_norm
           param[:bootmode] = :all
         elsif is_recv
           param[:bootmode] = :recovery
+        elsif is_def
+          param[:bootmode] = :default
         else
           param[:bootmode] = :normal
         end
