@@ -1,6 +1,9 @@
-[![Puppet Forge](http://img.shields.io/puppetforge/v/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
-[![Build Status](https://travis-ci.org/hercules-team/augeasproviders_grub.svg?branch=master)](https://travis-ci.org/hercules-team/augeasproviders_grub)
-[![Coverage Status](https://img.shields.io/coveralls/hercules-team/augeasproviders_grub.svg)](https://coveralls.io/r/hercules-team/augeasproviders_grub?branch=master)
+[![Puppet Forge Version](http://img.shields.io/puppetforge/v/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
+[![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
+[![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
+[![Build Status](https://img.shields.io/travis/hercules-team/augeasproviders_grub/master.svg)](https://travis-ci.org/hercules-team/augeasproviders_grub)
+[![Coverage Status](https://img.shields.io/coveralls/hercules-team/augeasproviders_grub.svg)](https://coveralls.io/r/hercules-team/augeasproviders_grub)
+[![Gemnasium](https://img.shields.io/gemnasium/hercules-team/augeasproviders_grub.svg)](https://gemnasium.com/hercules-team/augeasproviders_grub)
 
 
 # grub: type/provider for grub files for Puppet
