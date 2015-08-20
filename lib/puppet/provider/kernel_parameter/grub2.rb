@@ -18,6 +18,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
     which("grub2-mkconfig") or which("grub-mkconfig") or '/usr/sbin/grub-mkconfig'
   end
 
+  defaultfor :osfamily => 'Redhat', :operatingsystemmajrelease => [ '7' ]
   confine :feature => :augeas
   commands :mkconfig => mkconfig_path
 
