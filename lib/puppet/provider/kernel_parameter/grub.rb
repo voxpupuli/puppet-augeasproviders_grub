@@ -13,7 +13,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
   lens { 'Grub.lns' }
 
   confine :feature => :augeas
-  confine :grubversion => 1
+  confine :augeasprovider_grub_version => 1
 
   # Useful XPath to match only recovery entries
   MODE_RECOVERY = "(kernel/S or kernel/1 or kernel/single or .=~regexp('.*\((single-user|recovery) mode\).*'))"

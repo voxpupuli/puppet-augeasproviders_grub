@@ -7,7 +7,7 @@ provider_class = Puppet::Type.type(:kernel_parameter).provider(:grub)
 describe provider_class do
   before :each do
     Facter.clear
-    Facter.stubs(:fact).with(:grubversion).returns Facter.add(:grubversion) { setcode { 1 } }
+    Facter.stubs(:fact).with(:augeasprovider_grub_version).returns Facter.add(:augeasprovider_grub_version) { setcode { 1 } }
 
     provider_class.stubs(:default?).returns(true)
     FileTest.stubs(:exist?).returns false

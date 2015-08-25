@@ -23,7 +23,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
   defaultfor :operatingsystem => 'Ubuntu', :operatingsystemmajrelease => [ '14.04' ]
 
   confine :feature => :augeas
-  confine :grubversion => 2
+  confine :augeasprovider_grub_version => 2
   commands :mkconfig => mkconfig_path
 
   # when both grub* providers match, prefer GRUB 2
