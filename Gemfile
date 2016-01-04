@@ -38,7 +38,7 @@ group :development, :unit_tests do
   gem 'puppet-lint-version_comparison-check',              :require => false
   gem 'rspec-puppet-facts',                                :require => false
 
-  gem 'coveralls',                                         :require => false unless RUBY_VERSION =~ /^1\.8/
+  gem 'coveralls',                                         :require => false unless RUBY_VERSION =~ /^1\./
   gem 'simplecov', '~> 0.7.0',                             :require => false
   gem 'yard',                                              :require => false
   gem 'redcarpet', '~> 2.0',                               :require => false
