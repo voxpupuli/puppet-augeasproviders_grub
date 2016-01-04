@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0
+
+- Add support for bootmode 'default' (issue #3)
+
 ## 2.1.0
 
 - Set default to grub2 provider on el7 based systems (fix #9)
