@@ -54,6 +54,14 @@ Augeas Versions           | 0.10.0  | 1.0.0   | 1.1.0   | 1.2.0   |
 **PROVIDERS**             |
 kernel\_parameter (grub)  | **yes** | **yes** | **yes** | **yes** |
 kernel\_parameter (grub2) | **yes** | **yes** | **yes** | **yes** |
+grub\_config (grub)       | **yes** | **yes** | **yes** | **yes** |
+grub\_config (grub2)      | **yes** | **yes** | **yes** | **yes** |
+grub\_menuentry (grub)    | **yes** | **yes** | **yes** | **yes** |
+grub\_menuentry (grub2)   |   N/A   |   N/A   |   N/A   |   N/A   |
+grub\_user (grub2)        |   N/A   |   N/A   |   N/A   |   N/A   |
+
+**Note**: grub\_menuentry and grub\_user for GRUB2 do not use Augeas at this
+time due to lack of available lenses.
 
 ## Documentation and examples
 
@@ -125,7 +133,121 @@ Only recovery mode boots (unsupported with GRUB 2):
       target => "/mnt/boot/grub/menu.lst",
     }
 
+### grub_config provider
+
+This custom type manages GRUB Legacy and GRUB2 global configuration parameters.
+
+In GRUB Legacy, the global items at the top of the `grub.conf` file are managed.
+
+In GRUB2, the parameters in `/etc/defaults/grub` are managed.
+
+When using GRUB2, take care that you aren't conflicting with an option later
+specified by `grub_menuentry`. Also, be aware that, in GRUB2, any global items
+here will not be referenced unless you reference them by variable name per Bash
+semantics.
+
+#### change the default legacy GRUB timeout
+
+This will set the `timeout` global value in the Legacy GRUB configuration.
+
+    grub_config { 'timeout':
+      value => '1'
+    }
+
+#### change the default GRUB2 timeout
+
+This will set the `GRUB_TIMEOUT` global value in the GRUB2 configuration.
+
+    grub_config { 'GRUB_TIMEOUT':
+      value => '1'
+    }
+
+### grub_menuentry provider
+
+This is a custom type to manage GRUB Legacy and GRUB2 menu entries.
+
+The GRUB Legacy provider utlizes Augeas under the hood but GRUB2 did not have
+an available Lens and was written in Ruby.
+
+This will **not** allow for modifying dynamically generated system entries. You
+will need to remove some of the native GRUB2 configuration scripts to be fully
+independent of the default system values.
+
+The GRUB2 output of this provider will be saved, by default, in
+`/etc/grub.d/05_puppet_managed_<random_string>` where the `random_string` is a
+hash of the resource `name`.
+
+#### new entry preserving all existing values
+
+This will create a new menu entry and copy over any default values if present.
+If the entry currently exists, it will preserve all values and not overwrite
+them with the default system values.
+
+    grub_menuentry { 'new_entry':
+      root           => '(hd0,0)',
+      kernel         => ':preserve:',
+      initrd         => ':preserve:',
+      kernel_options => [':preserve:']
+    }
+
+#### kernel option lines
+
+There are many methods for identifying and manipulating kernel option lines and
+so a method was developed for handling the most common scenarios. You can, of
+course, simply denote every option, but this is cumbersome and prone to error
+over time.
+
+The following format is supported for the new options:
+
+    ':defaults:'  => Copy defaults from the default GRUB entry
+    ':preserve:'  => Preserve all existing options (if present)
+
+    Note: ':defaults:' and ':preserve:' are mutually exclusive.
+
+    All of the options below supersede any items affected by the above
+
+    'entry(=.*)?'   => Ensure that `entry` exists *as entered*; replaces all
+                       other options with the same name
+    '!:entry(=.*)?' => Add this option to the end of the arguments
+                       preserving any other options of the same name
+    '-:entry'       => Ensure that all instances of `entry` do not exist
+    '-:entry=foo'   => Ensure that only instances of `entry` with value `foo` do not exist
+
+    Note: Option removals and additions have higher precedence than preservation
+
+### grub_user provider
+
+This type manages GRUB2 users and superusers.
+
+The output of this provider is stored, by default, in `/etc/grub.d/01_puppet_managed_users`.
+
+Any plain text passwords are automatically converted into the appropriate GRUB
+PBKDF2 format.
+
+Note: If no users are defined as superusers, then GRUB2 will not enforce user
+restrictions on your entries.
+
+#### user with a plain text password
+
+    grub_user { 'test_user':
+      password => 'plain text password'
+    }
+
+#### user with a pre-hashed password
+
+    grub_user { 'test_user':
+      password => 'grub.pbkdf2.sha512.10000.REALLY_LONG_STRING'
+    }
+
+#### user that is a superuser with a plain text password and 20000 rounds
+
+    grub_user { 'test_user':
+      password  => 'plain text password',
+      superuser => true,
+      rounds    => '20000'
+    }
 
 ## Issues
 
-Please file any issues or suggestions [on GitHub](https://github.com/hercules-team/augeasproviders_grub/issues).
+Please file any issues or suggestions
+[on GitHub](https://github.com/hercules-team/augeasproviders_grub/issues).

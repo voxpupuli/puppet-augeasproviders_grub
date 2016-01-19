@@ -6,7 +6,10 @@
 Puppet::Type.newtype(:kernel_parameter) do
   @doc = "Manages kernel parameters stored in bootloaders."
 
-  ensurable
+  ensurable do
+    defaultvalues
+    defaultto :present
+  end
 
   newparam(:name) do
     desc "The parameter name, e.g. 'quiet' or 'vga'."
