@@ -78,8 +78,43 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
     end
   end
 
+  # If GRUB_CMDLINE_LINUX_DEFAULT does not exist, it should be set to the
+  # present contents of GRUB_CMDLINE_LINUX.
+  # If this is not done, you may end up with garbage on your next kernel
+  # upgrade!
+  def munge_grub_cmdline_linux_default(aug)
+    src_path = '$target/GRUB_CMDLINE_LINUX/value'
+    dest_path = '$target/GRUB_CMDLINE_LINUX_DEFAULT'
+
+    if aug.match("#{dest_path}/value").empty?
+      aug.match(src_path).each do |val|
+        src_val = aug.get(val)
+
+       # Need to let the rest of the code work on the actual value properly.
+       unless src_val.split('=').first.strip == resource[:name]
+          val_target = val.split('/').last
+
+          aug.set("#{dest_path}/#{val_target}", src_val)
+        end
+      end
+    end
+  end
+
   def value=(newval)
     augopen! do |aug|
+      # If we don't have the section at all, add it. Otherwise, any
+      # manipulation will result in a parse error.
+      current_section = self.class.section(resource)
+      has_section = aug.match("$target/#{current_section}")
+
+      if !has_section || has_section.empty?
+        aug.set("$target/#{current_section}/quote",'"')
+      end
+
+      if current_section == 'GRUB_CMDLINE_LINUX_DEFAULT'
+       munge_grub_cmdline_linux_default(aug)
+      end
+
       if newval && !newval.empty?
         vals = newval.clone
       else
@@ -105,7 +140,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       # Add new parameters where there are more values than existing params
       if vals && !vals.empty?
         vals.each do |val|
-          aug.set("$target/#{self.class.section(resource)}/value[last()+1]", "#{resource[:name]}=#{val}")
+          aug.set("$target/#{current_section}/value[last()+1]", "#{resource[:name]}=#{val}")
         end
       end
     end
