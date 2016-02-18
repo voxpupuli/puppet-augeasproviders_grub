@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+- Fix GRUB_CMDLINE_LINUX_DEFAULT (issue #14)
+- Add grub.cfg location for UEFI systems (issue #16)
+- Add two defaults in grub2 provider (issue #17)
+
 ## 2.2.0
 
 - Add support for bootmode 'default' (issue #3)
