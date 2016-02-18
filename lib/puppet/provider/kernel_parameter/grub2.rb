@@ -19,6 +19,9 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
   end
 
   defaultfor :osfamily => 'Redhat', :operatingsystemmajrelease => [ '7' ]
+  defaultfor :operatingsystem => 'Debian', :operatingsystemmajrelease => [ '8' ]
+  defaultfor :operatingsystem => 'Ubuntu', :operatingsystemmajrelease => [ '14.04' ]
+
   confine :feature => :augeas
   commands :mkconfig => mkconfig_path
 
