@@ -152,7 +152,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       cfg = c if FileTest.file? c
     }
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
-    
+
     super
     mkconfig "-o", cfg
   end
