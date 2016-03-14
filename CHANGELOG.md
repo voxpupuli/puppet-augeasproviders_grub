@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.0
+
+- Add support for global GRUB configuration
+- Add support for grub_menuentry providing the ability to manage individual
+  menu entries for both GRUB Legacy and GRUB2
+- Add support for managing GRUB2 users
+- The following custom types were created:
+  * grub_config :  Manages global GRUB settings
+  * grub_menuentry : Manages GRUB menuentries
+  * grub_user : Manages GRUB2 users
+
 ## 2.3.0
 
 - Fix GRUB_CMDLINE_LINUX_DEFAULT (issue #14)
