@@ -148,7 +148,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
   def flush
     cfg = nil
-    ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg", "/boot/efi/EFI/fedora/grub.cfg"].each {|c|
+    ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg", "/boot/efi/EFI/fedora/grub.cfg", "/etc/grub2-efi.cfg"].each {|c|
       cfg = c if FileTest.file? c
     }
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
