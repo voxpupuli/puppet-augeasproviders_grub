@@ -10,15 +10,10 @@ spec/fixtures/modules
 yardoc/
 .yardoc/
 
-## Beaker
-.vagrant
-log
-
 ## Ruby
 .rvmrc*
 .rbenv*
 .ruby-*
-Gemfile.lock
 
 ## MAC OS
 .DS_Store
