@@ -26,6 +26,9 @@ end
 
 describe provider_class do
   before :each do
+    Facter.clear
+    Facter.stubs(:fact).with(:augeasprovider_grub_version).returns Facter.add(:augeasprovider_grub_version) { setcode { 2 } }
+
     provider_class.stubs(:default?).returns(true)
     FileTest.stubs(:exist?).returns false
     FileTest.stubs(:file?).returns false
