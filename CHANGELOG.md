@@ -10,6 +10,8 @@
   * grub_config :  Manages global GRUB settings
   * grub_menuentry : Manages GRUB menuentries
   * grub_user : Manages GRUB2 users
+- Confine GRUB providers to presence of menus, prefer GRUB 2 (#8)
+- Fix build on Ruby 1.8
 
 ## 2.3.0
 
