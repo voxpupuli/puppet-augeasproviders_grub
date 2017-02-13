@@ -3,6 +3,7 @@
 # Copyright (c) 2012 Dominic Cleal
 # Licensed under the Apache License, Version 2.0
 
+raise("Missing augeasproviders_core dependency") if Puppet::Type.type(:augeasprovider).nil?
 Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Uses Augeas API to update kernel parameters in GRUB2's /etc/default/grub"
 
