@@ -2,7 +2,7 @@ language: ruby
 dist: precise
 sudo: required
 rvm:
-  - 2.0.0
+  - 2.1.9
   # Ruby with Puppet 5
   - 2.4.0
 notifications:
@@ -20,11 +20,11 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - PUPPET=5.0 RUBY_AUGEAS=0.5
+    - env: PUPPET=5.0 RUBY_AUGEAS=0.5
   exclude:
 # base exclude
-    # No support for Ruby 2.0.0 in Puppet 5
-    - rvm: 2.0.0
+    # No support for Ruby 2.1.9 in Puppet 5
+    - rvm: 2.1.9
       env: PUPPET=5.0 RUBY_AUGEAS=0.5
 
 install:
@@ -43,5 +43,5 @@ deploy:
     # all_branches is required to use tags
     all_branches: true
     # Only publish if our main Ruby target builds
-    rvm: 2.0.0
+    rvm: 2.1.9
     condition: "$FORGE_PUBLISH = true"
