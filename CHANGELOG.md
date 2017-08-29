@@ -5,7 +5,7 @@
 - Added code to fix the EFI stack on Linux hosts
 - Restricted the RHEL and CentOS support to only what can be tested
 - Pinned supported puppet versions between 4.7.2 and 5.0.0
-  - This is the oldes Puppet, Inc. supported version and there are currently
+  - This is the oldest Puppet, Inc. supported version and there are currently
     issues in 5.X
 
 ## 2.4.0
