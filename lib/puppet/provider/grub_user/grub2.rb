@@ -211,7 +211,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
 # This file managed by Puppet
 # Manual changes will be erased!
 ########
-exec tail -n +3 $0
+cat << USER_LIST
     EOM
 
     # Build the password file
@@ -241,6 +241,7 @@ exec tail -n +3 $0
     end
 
     output += users
+    output << 'USER_LIST'
 
     output = output.join("\n")
 
