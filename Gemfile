@@ -40,6 +40,7 @@ group :development, :unit_tests do
   gem 'puppet-lint-version_comparison-check',              :require => false
   gem 'rspec-puppet-facts',                                :require => false
   gem 'beaker-rspec',                                      :require => false
+  gem 'simp-beaker-helpers',                               :require => false
 
   gem 'coveralls',                                         :require => false unless RUBY_VERSION =~ /^1\.8/
   gem 'simplecov', '~> 0.7.0',                             :require => false
