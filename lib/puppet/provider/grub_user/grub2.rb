@@ -20,6 +20,26 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
 
   mk_resource_methods
 
+  def self.grub2_cfg
+    require 'puppetx/augeasproviders_grub/menuentry'
+
+    PuppetX::AugeasprovidersGrub::Util.grub2_cfg
+  end
+
+  def grub2_cfg
+    self.class.grub2_cfg
+  end
+
+  def self.grub2_cfg_path
+    require 'puppetx/augeasproviders_grub/menuentry'
+
+    PuppetX::AugeasprovidersGrub::Util.grub2_cfg_path
+  end
+
+  def grub2_cfg_path
+    self.class.grub2_cfg_path
+  end
+
   def self.extract_users(content)
     superusers = nil
     users = {}
@@ -56,11 +76,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
     # Short circuit if we've already gathered this information
     return @instance_array if @instance_array
 
-    require 'puppetx/augeasproviders_grub/menuentry'
-
-    grub2_config = PuppetX::AugeasprovidersGrub::Util.grub2_cfg
-
-    all_users = extract_users(grub2_config)
+    all_users = extract_users(grub2_cfg)
 
     @instance_array = all_users.collect{|x| x = new(x)}
 
@@ -96,6 +112,10 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
     # Clean up our class instance variables in case we're running in daemon mode.
     @instance_array = nil
     @already_reported = nil
+  end
+
+  def initialize(args)
+    super
   end
 
   def exists?
@@ -203,6 +223,13 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
   end
 
   def flush
+    # This is to clean up the legacy file that was put in place incorrectly
+    # prior to the standard 01_users configuration file
+    legacy_file = '/etc/grub.d/01_puppet_managed_users'
+    unless resource[:target] == legacy_file
+      File.unlink(legacy_file) if File.exist?(legacy_file)
+    end
+
     output = []
 
     output << <<-EOM
@@ -257,30 +284,7 @@ cat << USER_LIST
       FileUtils.chmod(0755, resource[:target])
     end
 
-    os_info = Facter.value(:os)
-    if os_info
-      os_name = Facter.value(:os)['name']
-    else
-      # Support for old versions of Facter
-      unless os_name
-        os_name = Facter.value(:operatingsystem)
-      end
-    end
-
-    cfg = nil
-    [
-      "/etc/grub2-efi.cfg",
-      # Handle the standard EFI naming convention
-      "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
-      "/etc/grub2.cfg",
-      "/boot/grub/grub.cfg",
-      "/boot/grub2/grub.cfg"
-    ].each {|c|
-      cfg = c if FileTest.file? c
-    }
-    fail("Cannot find grub.cfg location to use with #{command(:mkconfig)}") unless cfg
-
-    mkconfig "-o", cfg
+    mkconfig "-o", grub2_cfg_path
   end
 
   private
