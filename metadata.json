@@ -64,11 +64,3 @@
     }
   ]
 }
-  ],
-  "requirements": [
-    {
-      "name": "puppet",
-      "version_requirement": ">= 4.7.1 < 6.0.0"
-    }
-  ]
-}
