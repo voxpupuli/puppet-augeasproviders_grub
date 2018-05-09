@@ -43,19 +43,17 @@ Puppet::Type.newtype(:grub_user) do
     EOM
 
     newvalues(:true, :false)
-
     defaultto(:false)
   end
 
-  newparam(:target) do
+  newparam(:target, :parent => Puppet::Parameter::Path) do
     desc <<-EOM
       The file to which to write the user information.
 
       Must be an absolute path.
     EOM
 
-    newvalues(/^\/.+/)
-    defaultto('/etc/grub.d/01_puppet_managed_users')
+    defaultto('/etc/grub.d/02_puppet_managed_users')
   end
 
   newparam(:report_unmanaged, :boolean => true) do

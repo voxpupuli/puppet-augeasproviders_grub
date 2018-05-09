@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+- Fix generation of grub2 user entries
+- Add support for OEL
+
 ## 3.0.0
 
 - Added code to fix the EFI stack on Linux hosts
