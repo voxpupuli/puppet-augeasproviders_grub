@@ -128,6 +128,7 @@ module PuppetX
       def self.grub2_cfg_path
         paths = [
           '/etc/grub2.cfg',
+          '/boot/grub/grub.cfg',
           '/boot/grub2/grub.cfg'
         ]
 
