@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+- Add back path for grub.cfg on Debian OS. (#36)
+- Deprecate support for Puppet < 5
+- Support Puppet 5 & 6
+- Update supported OSes in metadata.json
+
 ## 3.0.1
 - Fix generation of grub2 user entries
 - Add support for OEL
