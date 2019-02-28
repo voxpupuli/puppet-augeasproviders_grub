@@ -1,31 +1,20 @@
 language: ruby
-dist: precise
 sudo: required
 rvm:
-  - 2.1.9
   # Ruby with Puppet 5
-  - 2.4.0
+  - 2.4.4
 notifications:
   email:
    - raphael.pinson@camptocamp.com
 env:
 # base env
-  # Test Puppet 4
-  - PUPPET=4.0 RUBY_AUGEAS=0.5
-  # Test Oldest Puppet, Inc. supported Puppet
-  - PUPPET=4.7.1 RUBY_AUGEAS=0.5 FORGE_PUBLISH=true
+  # Test latest Puppet 5 version
+  - PUPPET=5.5 RUBY_AUGEAS=0.5
   # Test latest Puppet version
-  - PUPPET=5.0 RUBY_AUGEAS=0.5
+  - PUPPET=6 RUBY_AUGEAS=0.5 FORGE_PUBLISH=true
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - env: PUPPET=5.0 RUBY_AUGEAS=0.5
-  exclude:
-# base exclude
-    # No support for Ruby 2.1.9 in Puppet 5
-    - rvm: 2.1.9
-      env: PUPPET=5.0 RUBY_AUGEAS=0.5
 
 install:
   - "travis_retry ./.travis.sh"
@@ -43,5 +32,5 @@ deploy:
     # all_branches is required to use tags
     all_branches: true
     # Only publish if our main Ruby target builds
-    rvm: 2.1.9
+    rvm: 2.4.4
     condition: "$FORGE_PUBLISH = true"
