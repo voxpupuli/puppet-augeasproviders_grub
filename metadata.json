@@ -1,6 +1,6 @@
 {
   "name": "herculesteam-augeasproviders_grub",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "author": "Dominic Cleal, Raphael Pinson, Trevor Vaughan",
   "summary": "Augeas-based grub types and providers for Puppet",
   "license": "Apache-2.0",
