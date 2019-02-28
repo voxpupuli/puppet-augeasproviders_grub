@@ -9,9 +9,9 @@ notifications:
 env:
 # base env
   # Test latest Puppet 5 version
-  - PUPPET=5.5 RUBY_AUGEAS=0.5
+  - PUPPET=5.5 RUBY_AUGEAS=0.5 FORGE_PUBLISH=true
   # Test latest Puppet version
-  - PUPPET=6 RUBY_AUGEAS=0.5 FORGE_PUBLISH=true
+  - PUPPET=6 RUBY_AUGEAS=0.5
 
 matrix:
   fast_finish: true
