@@ -66,6 +66,12 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
   end
 
   def value=(newval)
+    if newval.is_a?(String)
+      unless %w[' "].include?(newval[0].chr)
+        newval = %Q("#{newval}")
+      end
+    end
+
     augopen! do |aug|
       aug.set("$target/#{resource[:name]}", newval)
     end

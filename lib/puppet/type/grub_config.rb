@@ -45,6 +45,18 @@ Puppet::Type.newtype(:grub_config) do
     desc <<-EOM
       Value of the GRUB parameter.
     EOM
+
+    munge do |value|
+      value.to_s unless [Hash, Array].include?(value.class)
+    end
+
+    def insync?(is)
+      if is.is_a?(String) && should.is_a?(String)
+        is.gsub(/\A("|')|("|')\Z/,'') == should.gsub(/\A("|')|("|')\Z/,'')
+      else
+        is == should
+      end
+    end
   end
 
   autorequire(:file) do
