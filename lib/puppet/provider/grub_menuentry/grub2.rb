@@ -539,7 +539,13 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
     FileUtils.chmod(0755, @new_entry[:output_file])
 
     cfg = nil
-    ["/etc/grub2.cfg", "/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"].each {|c|
+    [
+      "/etc/grub2-efi.cfg",
+      # Handle the standard EFI naming convention
+      "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
+      "/boot/grub2/grub.cfg",
+      "/boot/grub/grub.cfg"
+    ].each {|c|
       cfg = c if FileTest.file? c
     }
     fail("Cannot find grub.cfg location to use with #{command(:mkconfig)}") unless cfg
