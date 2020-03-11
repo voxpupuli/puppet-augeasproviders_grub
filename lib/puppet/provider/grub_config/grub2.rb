@@ -78,8 +78,24 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
   end
 
   def flush
+    os_info = Facter.value(:os)
+    if os_info
+      os_name = Facter.value(:os)['name']
+    else
+      # Support for old versions of Facter
+      unless os_name
+        os_name = Facter.value(:operatingsystem)
+      end
+    end
+
     cfg = nil
-    ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"].each {|c|
+    [
+      "/etc/grub2-efi.cfg",
+      # Handle the standard EFI naming convention
+      "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
+      "/boot/grub2/grub.cfg",
+      "/boot/grub/grub.cfg"
+    ].each {|c|
       cfg = c if FileTest.file? c
     }
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
