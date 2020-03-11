@@ -28,10 +28,7 @@ module PuppetX
         def_opts = Array(default_opts).flatten.map(&:strip)
 
         result_opts = []
-
-        if opts.delete(':defaults:')
-          result_opts += def_opts
-        end
+        result_opts = def_opts.dup if opts.delete(':defaults:')
 
         if opts.delete(':preserve:')
           # Need to remove any result opts that are being preserved
@@ -89,8 +86,12 @@ module PuppetX
           end
         end
 
-        result_opts = tmp_results.compact + new_results + appends
-        return result_opts
+        # Ensure that we're not duplicating arguments
+        return (tmp_results.compact + new_results + appends).
+          flatten.
+          join(' ').
+          scan(/\S+=(?:(?:".+?")|(?:\S+))|\S+/).
+          uniq
       end
 
       # Take care of copying ':default:' values and ensure that the leading
@@ -180,10 +181,8 @@ module PuppetX
 
         default_kernel_opts = Array(default_kernel_opts)
 
-        if default_kernel
-          if prepend_kernel_path
-            default_kernel_opts = Array(default_kernel) + default_kernel_opts
-          end
+        if default_kernel && prepend_kernel_path
+          default_kernel_opts = Array(default_kernel) + default_kernel_opts
         end
 
         return munge_options(old_opts, new_opts, default_kernel_opts)

@@ -76,7 +76,7 @@ describe 'Global Config Tests' do
       end
 
       it 'should have a timeout of 1' do
-        on(host, %(grep 'GRUB_TIMEOUT="1"' /etc/default/grub))
+        on(host, %(grep 'GRUB_TIMEOUT="\\?1"\\?' /etc/default/grub))
         on(host, %(grep 'timeout=1' /boot/grub2/grub.cfg))
       end
     end

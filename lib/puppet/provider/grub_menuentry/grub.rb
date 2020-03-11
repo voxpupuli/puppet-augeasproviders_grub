@@ -92,7 +92,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
         kernel = aug.get("#{pp}/kernel")
         initrd = aug.get("#{pp}/initrd")
         fs_root = aug.get("#{pp}/root")
-        default_entry = ((aug.get("$target/default") || '0').to_i + 1).to_s.to_sym
+        default_entry = ((aug.get("$target/default") || '0').to_i + 1)
 
         modules = self.class.get_modules(aug, pp)
 
@@ -100,10 +100,8 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
           :name          => entry_name,
           :ensure        => :present,
           :root          => fs_root,
-          :default_entry => (pp.split('[').last[0].chr == default_entry).to_s.to_sym,
-          # Broken in the lens
-          #:lock          => aug.exists("#{pp}/lock").to_s.to_sym,
-          :makeactive    => aug.exists("#{pp}/makeactive").to_s.to_sym
+          :default_entry => (pp.split('[').last[0].chr == default_entry),
+          :makeactive    => aug.exists("#{pp}/makeactive")
         }
 
         if kernel
@@ -249,7 +247,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
   end
 
   def default_entry
-    return (menu_entry_index == @default_entry[:index]).to_s.to_sym
+    menu_entry_index == @default_entry[:index]
   end
 
   def default_entry=(newval)
@@ -367,12 +365,6 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     process_option_line(new_kernel_options,'kernel')
   end
 
-  def lock
-    augopen do |aug|
-      return aug.exists("#{menu_entry_path}/lock").to_s.to_sym
-    end
-  end
-
   def modules
     augopen do |aug|
       self.class.get_modules(aug, menu_entry_path)
@@ -427,7 +419,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
   def makeactive
     augopen do |aug|
-      return aug.exists("#{menu_entry_path}/makeactive").to_s.to_sym
+      aug.exists("#{menu_entry_path}/makeactive")
     end
   end
 
