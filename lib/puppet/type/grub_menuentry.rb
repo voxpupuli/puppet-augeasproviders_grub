@@ -63,7 +63,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     newvalues(/\(.*\)/)
   end
 
-  newproperty(:default_entry, :parent => Puppet::Property::Boolean) do
+  newproperty(:default_entry) do
     desc <<-EOM
       If set, make this menu entry the default entry.
 
@@ -77,6 +77,16 @@ Puppet::Type.newtype(:grub_menuentry) do
             type to set the system default.
     EOM
     newvalues(:true, :false)
+
+    def should
+      return nil unless defined?(@should)
+
+      (@should - [true,:true]).empty?
+    end
+
+    def insync?(is)
+      is == should
+    end
   end
 
   newproperty(:kernel) do
@@ -210,17 +220,27 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:makeactive, :parent => Puppet::Property::Boolean, :required_features => %w(grub)) do
+  newproperty(:makeactive, :required_features => %w(grub)) do
     desc <<-EOM
       In Legacy GRUB, having this set will add a 'makeactive' entry to the menuentry.
     EOM
     newvalues(:true, :false)
 
     defaultto :false
+
+    def should
+      return nil unless defined?(@should)
+
+      (@should - [true,:true]).empty?
+    end
+
+    def insync?(is)
+      is == should
+    end
   end
 
   # GRUB2 only properties
-  newproperty(:bls, :parent => Puppet::Property::Boolean, :required_features => %w(grub2)) do
+  newproperty(:bls, :required_features => %w(grub2)) do
     desc <<-EOM
       Explicitly enable, or disable, BLS support for this resource.
 
@@ -228,6 +248,16 @@ Puppet::Type.newtype(:grub_menuentry) do
     EOM
 
     newvalues(:true, :false)
+
+    def should
+      return nil unless defined?(@should)
+
+      (@should - [true,:true]).empty?
+    end
+
+    def insync?(is)
+      is == should
+    end
   end
 
   newproperty(:classes, :array_matching => :all, :required_features => %w(grub2)) do
@@ -258,7 +288,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:load_16bit, :parent => Puppet::Property::Boolean, :required_featurees => %w(grub2)) do
+  newproperty(:load_16bit, :required_featurees => %w(grub2)) do
     desc <<-EOM
       If set, ensure that `linux16` and `initrd16` are used for the kernel entries.
 
@@ -266,15 +296,35 @@ Puppet::Type.newtype(:grub_menuentry) do
     EOM
 
     newvalues(:true, :false)
+
+    def should
+      return nil unless defined?(@should)
+
+      (@should - [true,:true]).empty?
+    end
+
+    def insync?(is)
+      is == should
+    end
   end
 
-  newproperty(:load_video, :parent => Puppet::Property::Boolean, :required_features => %w(grub2)) do
+  newproperty(:load_video, :required_features => %w(grub2)) do
     desc <<-EOM
       If true, add the `load_video` command to the menuentry.
 
       Will default to `true` unless the entry is a BLS entry.
     EOM
     newvalues(:true, :false)
+
+    def should
+      return nil unless defined?(@should)
+
+      (@should - [true,:true]).empty?
+    end
+
+    def insync?(is)
+      is == should
+    end
   end
 
   newproperty(:plugins, :array_matching => :all, :required_features => %w(grub2)) do

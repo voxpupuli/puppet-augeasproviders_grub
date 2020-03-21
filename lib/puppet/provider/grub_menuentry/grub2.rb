@@ -310,16 +310,17 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
 
     @property_hash[:target] = resource[:target] if resource[:target]
     @property_hash[:add_defaults_on_creation] = resource[:add_defaults_on_creation]
+    @property_hash[:classes] ||= resource[:classes] || []
 
     @property_hash[:bls] = @bls_system && (@property_hash[:bls] || (@property_hash[:bls].nil? && (resource[:bls].nil? || resource[:bls])))
 
     # BLS and non-BLS systems must be treated differently
     if @property_hash[:bls] || resource[:bls]
       @property_hash[:args] ||= []
-    else @property_hash[:bls]
+    else
       @property_hash[:load_16bit] ||= resource[:load_16bit].nil? ? true : resource[:load_16bit]
       @property_hash[:load_video] ||= resource[:load_video].nil? ? true : resource[:load_video]
-      @property_hash[:plugins] ||= resource[:plugins].nil? ? true : resource[:plugins]
+      @property_hash[:plugins] ||= resource[:plugins].nil? ? ['gzio','part_msdos','xfs','ext2'] : resource[:plugins]
     end
 
     retval = @property_hash[:name] == resource[:name]
@@ -353,7 +354,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
       @property_hash[:root]       = resource[:root]
       @property_hash[:load_16bit] = resource[:load_16bit]
       @property_hash[:load_video] = resource[:load_video]
-      @property_hash[:plugins]    = resource[:plugins]
+      @property_hash[:plugins]  ||= resource[:plugins].nil? ? ['gzio','part_msdos','xfs','ext2'] : resource[:plugins]
     end
   end
 
