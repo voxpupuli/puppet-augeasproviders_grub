@@ -67,8 +67,8 @@ describe 'GRUB Menuentry Tests' do
           result_hash[$1.strip] = $2.strip
         end
 
-        expect(result_hash['title']).to eq('Standard')
-        expect(result_hash['args']).to match(/trogdor=BURNINATE/)
+        expect(result_hash['title'].delete('"')).to eq('Standard')
+        expect(result_hash['args'].delete('"')).to include('trogdor=BURNINATE')
       end
 
       it 'should activate on reboot' do
