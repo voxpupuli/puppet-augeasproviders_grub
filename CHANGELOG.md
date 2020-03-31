@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.0
+
+- Support Puppet 6 (#42)
+- Fix String value issues in grub_config (#46)
+- Fix EFI code for grub_config and grub_menuentry (#48)
+- Add BLS support to grub_menuentry (#50)
+
 ## 3.1.0
 
 - Add back path for grub.cfg on Debian OS. (#36)
