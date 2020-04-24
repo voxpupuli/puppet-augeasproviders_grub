@@ -143,7 +143,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
         @grubby_info[key.strip] = val.strip
       end
-    rescue PuppetExecutionFailure
+    rescue Puppet::ExecutionFailure
       @grubby_info = {}
     end
 
