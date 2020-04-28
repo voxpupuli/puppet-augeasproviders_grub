@@ -749,16 +749,8 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
 
   # Run the grub2-mkconfig command on the discovered file paths deconflicting
   # across symlinks
-  def grub2_mkconfig(cfg_paths=['/etc/grub2.cfg', '/etc/grub2-efi.cfg', '/boot/grub/grub.cfg', '/boot/grub2/grub.cfg'])
+  def grub2_mkconfig(cfg_paths=[])
     tgt_files = []
-
-    cfg_paths.each do |path|
-      begin
-        tgt_files << File.realpath(path)
-      rescue
-        next
-      end
-    end
 
     os_info = Facter.value(:os)
     if os_info
@@ -770,22 +762,31 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
       end
     end
 
-    cfg = nil
-    [
+    cfg_paths = [
+      "/etc/grub2.cfg",
       "/etc/grub2-efi.cfg",
       # Handle the standard EFI naming convention
       "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
       "/boot/grub2/grub.cfg",
       "/boot/grub/grub.cfg"
-    ].each {|c|
-      cfg = c if FileTest.file? c
-    }
-    fail("Cannot find grub.cfg location to use with #{command(:mkconfig)}") unless cfg
+    ] if cfg_paths.empty?
+
+    cfg_paths.each do |path|
+      begin
+        tgt_files << File.realpath(path)
+      rescue
+        next
+      end
+    end
+
+    cfg_paths = cfg_paths.select{|x| FileTest.file?(x)}
+
+    fail("Cannot find a grub configuration at any of '#{cfg_paths.join(', ')}' to use with #{command(:mkconfig)}") if cfg_paths.empty?
 
     # This takes a while to run
     mkconfig_output = mkconfig
 
-    cfg_paths.uniq.each do |cfg_path|
+    tgt_files.uniq.each do |cfg_path|
       File.open(cfg_path, 'w') do |fh|
         fh.puts(mkconfig_output)
         fh.flush
