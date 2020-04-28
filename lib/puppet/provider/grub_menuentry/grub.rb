@@ -333,7 +333,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
   end
 
   def kernel_options?(is,should)
-    if resource[:add_defaults_on_creation] == :true && should.include?(':preserve:')
+    if resource[:add_defaults_on_creation] && should.include?(':preserve:')
       should << ':defaults:'
     end
 
@@ -377,7 +377,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
     i = 0
     Array(should).each do |module_set|
-      if resource[:add_defaults_on_creation] == :true && module_set.include?(':preserve:')
+      if resource[:add_defaults_on_creation] && module_set.include?(':preserve:')
         module_set << ':defaults:'
       end
 
