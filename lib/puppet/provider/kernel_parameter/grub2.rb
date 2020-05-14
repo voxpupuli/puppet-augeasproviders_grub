@@ -164,7 +164,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       end
     end
 
-    cfg = nil
+    cfg = []
     [
       "/etc/grub2-efi.cfg",
       # Handle the standard EFI naming convention
@@ -175,14 +175,15 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       if FileTest.file?(c) || ( FileTest.symlink?(c) &&
           FileTest.directory?(File.dirname(File.absolute_path(File.readlink(c)))) )
 
-        cfg = c
-        break
+        cfg.push(c)
 
       end
     }
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
 
     super
-    mkconfig "-o", cfg
+    cfg.each {|c|
+      mkconfig "-o", c
+    }
   end
 end
