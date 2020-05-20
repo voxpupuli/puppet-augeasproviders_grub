@@ -175,7 +175,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       if FileTest.file?(c) || ( FileTest.symlink?(c) &&
           FileTest.directory?(File.dirname(File.absolute_path(File.readlink(c)))) )
 
-        cfg.push(c)
+        cfg << c
 
       end
     }
