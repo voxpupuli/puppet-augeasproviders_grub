@@ -38,6 +38,7 @@ describe provider_class do
       FileTest.stubs(:exist?).with(path).returns true
       FileTest.stubs(:executable?).with(path).returns true
     end
+    FileTest.stubs(:file?).with('/etc/grub2-efi.cfg').returns true
     FileTest.stubs(:file?).with('/boot/grub2/grub.cfg').returns true
     FileTest.stubs(:exist?).with('/etc/default/grub').returns true
   end
@@ -70,6 +71,7 @@ describe provider_class do
     describe "when creating entries" do
       before :each do
         provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg")
+        provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
       end
 
       it "should create no-value entries" do
@@ -214,6 +216,7 @@ describe provider_class do
 
     it "should delete entries" do
       provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg")
+      provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
 
       apply!(Puppet::Type.type(:kernel_parameter).new(
         :name     => "divider",
@@ -243,6 +246,7 @@ describe provider_class do
 
       it "should change existing values" do
         provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg")
+        provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
         apply!(Puppet::Type.type(:kernel_parameter).new(
           :name     => "elevator",
           :ensure   => :present,
@@ -268,6 +272,7 @@ describe provider_class do
 
       it "should add value to entry" do
         provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg")
+        provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
         apply!(Puppet::Type.type(:kernel_parameter).new(
           :name     => "quiet",
           :ensure   => :present,
@@ -293,6 +298,7 @@ describe provider_class do
 
       it "should add and remove entries for multiple values" do
         provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg").times(2)
+        provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg").times(2)
 
         # Add multiple entries
         apply!(Puppet::Type.type(:kernel_parameter).new(
