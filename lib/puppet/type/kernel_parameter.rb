@@ -32,6 +32,13 @@ Puppet::Type.newtype(:kernel_parameter) do
     defaultto :all
   end
 
+  newparam(:mkconfig, :boolean => true) do
+    desc "Whether grub(2)-mkconfig should be ran after updating the GRUB configuration"
+
+    newvalues(:true, :false)
+    defaultto(:true)
+  end
+
   autorequire(:file) do
     self[:target]
   end

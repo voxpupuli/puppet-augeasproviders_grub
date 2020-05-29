@@ -101,6 +101,9 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
 
     super
-    mkconfig "-o", cfg
+
+    if mkconfig
+      mkconfig "-o", cfg
+    end
   end
 end

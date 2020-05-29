@@ -78,6 +78,13 @@ Puppet::Type.newtype(:grub_user) do
     end
   end
 
+  newparam(:mkconfig, :boolean => true) do
+    desc "Whether grub(2)-mkconfig should be ran after updating the GRUB configuration"
+
+    newvalues(:true, :false)
+    defaultto(:true)
+  end
+
   newproperty(:purge, :boolean => true) do
     desc <<-EOM
       Purge all unmanaged users.
