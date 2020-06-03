@@ -284,9 +284,7 @@ cat << USER_LIST
       FileUtils.chmod(0755, resource[:target])
     end
 
-    if mkconfig
-      mkconfig "-o", grub2_cfg_path
-    end
+    mkconfig "-o", grub2_cfg_path if resource[:run_mkconfig]
   end
 
   private

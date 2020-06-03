@@ -78,7 +78,7 @@ Puppet::Type.newtype(:grub_user) do
     end
   end
 
-  newparam(:mkconfig, :boolean => true) do
+  newparam(:run_mkconfig, :boolean => true) do
     desc "Whether grub(2)-mkconfig should be ran after updating the GRUB configuration"
 
     newvalues(:true, :false)

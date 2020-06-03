@@ -102,8 +102,6 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
 
     super
 
-    if mkconfig
-      mkconfig "-o", cfg
-    end
+    mkconfig "-o", cfg if resource[:run_mkconfig]
   end
 end
