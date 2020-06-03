@@ -536,9 +536,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
           FileUtils.rm_f(legacy_target)
 
           # Need to rebuild the full grub config if we removed a legacy target
-          if mkconfig
-            grub2_mkconfig
-          end
+          grub2_mkconfig if resource[:run_mkconfig]
         end
       end
     else

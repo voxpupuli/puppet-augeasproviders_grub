@@ -183,7 +183,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
     super
 
-    if mkconfig
+    if resource[:run_mkconfig]
       cfg.each {|c|
         mkconfig "-o", c
       }
