@@ -74,6 +74,34 @@ describe provider_class do
         provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
       end
 
+      it "should not run mkconfig if run_mkconfig is false" do
+        provider_class.any_instance.expects(:mkconfig).never
+        provider_class.any_instance.expects(:mkconfig).never
+
+        apply!(Puppet::Type.type(:kernel_parameter).new(
+          :name         => "foo",
+          :ensure       => :present,
+          :target       => target,
+          :provider     => "grub2",
+          :run_mkconfig => false
+        ))
+
+        augparse_filter(target, LENS, FILTER, '
+          { "GRUB_CMDLINE_LINUX"
+            { "quote" = "\"" }
+            { "value" = "quiet" }
+            { "value" = "elevator=noop" }
+            { "value" = "divider=10" }
+            { "value" = "foo" }
+          }
+          { "GRUB_CMDLINE_LINUX_DEFAULT"
+            { "quote" = "\"" }
+            { "value" = "rhgb" }
+            { "value" = "nohz=on" }
+          }
+        ')
+      end
+
       it "should create no-value entries" do
         apply!(Puppet::Type.type(:kernel_parameter).new(
           :name     => "foo",
