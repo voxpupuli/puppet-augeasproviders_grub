@@ -239,6 +239,32 @@ describe provider_class do
       ')
     end
 
+    it "should delete entries from GRUB_CMDLINE_LINUX_DEFAULT with bootmode all" do
+      provider_class.any_instance.expects(:mkconfig).with("-o", "/boot/grub2/grub.cfg")
+      provider_class.any_instance.expects(:mkconfig).with("-o", "/etc/grub2-efi.cfg")
+
+      apply!(Puppet::Type.type(:kernel_parameter).new(
+        :name     => "rhgb",
+        :ensure   => "absent",
+        :bootmode => :all,
+        :target   => target,
+        :provider => "grub2"
+      ))
+
+      augparse_filter(target, LENS, FILTER, '
+        { "GRUB_CMDLINE_LINUX"
+          { "quote" = "\"" }
+          { "value" = "quiet" }
+          { "value" = "elevator=noop" }
+          { "value" = "divider=10" }
+        }
+        { "GRUB_CMDLINE_LINUX_DEFAULT"
+          { "quote" = "\"" }
+          { "value" = "nohz=on" }
+        }
+      ')
+    end
+
     describe "when modifying values" do
       before :each do
         provider_class.any_instance.stubs(:create).never

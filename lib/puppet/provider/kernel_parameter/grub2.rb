@@ -77,6 +77,13 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
     self.value=(resource[:value])
   end
 
+  def destroy
+    augopen! do |aug|
+      aug.rm("$target/GRUB_CMDLINE_LINUX_DEFAULT/value[.=~regexp('^#{resource[:name]}(=.*)?$')]")
+      aug.rm("$target/GRUB_CMDLINE_LINUX/value[.=~regexp('^#{resource[:name]}(=.*)?$')]")
+    end
+  end
+
   def value
     augopen do |aug|
       aug.match('$resource').map {|vp|
