@@ -19,7 +19,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
     which("grub2-mkconfig") or which("grub-mkconfig") or '/usr/sbin/grub-mkconfig'
   end
 
-  defaultfor :osfamily => 'Redhat', :operatingsystemmajrelease => [ '7' ]
+  defaultfor :osfamily => 'RedHat', :operatingsystemmajrelease => [ '7' ]
   defaultfor :operatingsystem => 'Debian', :operatingsystemmajrelease => [ '8' ]
   defaultfor :operatingsystem => 'Ubuntu', :operatingsystemmajrelease => [ '14.04' ]
 
