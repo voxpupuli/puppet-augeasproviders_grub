@@ -1,7 +1,19 @@
 language: ruby
-sudo: required
+version: ~> 1.0
+os: linux
+sudo: false
+bundler_args: --without development system_tests --path vendor
+
+addons:
+  apt:
+    packages:
+      # provides unbuffer
+      - expect-dev
+      - libaugeas-dev
+      - augeas-tools
+
 rvm:
-  - 2.4.4
+  - 2.5.8
 notifications:
   email:
    - raphael.pinson@camptocamp.com
@@ -11,15 +23,13 @@ env:
   - PUPPET=5.5 RUBY_AUGEAS=0.5 FORGE_PUBLISH=true
   # Test latest Puppet version
   - PUPPET=6 RUBY_AUGEAS=0.5
-
+  - PUPPET=7 RUBY_AUGEAS=0.5
 
 matrix:
   fast_finish: true
 
-install:
-  - "travis_retry ./.travis.sh"
 script:
-  - AUGEAS_LENS_LIB=lib/augeas/lenses:augeas/lenses bundle exec rake
+  - AUGEAS_LENS_LIB=lib/augeas/lenses:augeas/lenses travis_wait 45 unbuffer bundle exec rake
   # Do not include the augeas/ directory in the deployed module
   - rm -rf augeas/
 deploy:

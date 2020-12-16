@@ -14,16 +14,9 @@ HOSTS:
     box:        generic/centos8
     hypervisor: vagrant
 
-  el6:
-    roles:
-      - grub
-    platform:   el-6-x86_64
-    box:        puppetlabs/centos-6.6-64-nocm
-    box_url:    https://vagrantcloud.com/puppetlabs/boxes/centos-6.6-64-nocm
-    hypervisor: vagrant
-
 CONFIG:
   log_level: verbose
   type:      aio
   vagrant_memsize: 256
+  puppet_collection: puppet6
   ## vb_gui: true

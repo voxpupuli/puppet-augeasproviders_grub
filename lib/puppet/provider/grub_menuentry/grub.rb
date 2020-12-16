@@ -79,7 +79,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
   end
 
   def self.instances
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     resources = []
 
@@ -132,7 +132,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
 
   def initialize(*args)
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     @grubby_info = {}
     begin

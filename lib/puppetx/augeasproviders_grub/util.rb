@@ -122,40 +122,59 @@ module PuppetX
         return value
       end
 
-      # Return the location of the GRUB2 configuration on the system.
-      # Raise an error if not found.
+      # Return the name of the current operating system or an empty string if
+      # not found.
+      #
+      # @return (String) The current operating system name
+      def self.os_name
+        # The usual fact
+        (Facter.value(:os) && Facter.value(:os)['name']) ||
+          # Legacy support
+          Facter.value(:operatingsystem) ||
+          # Fallback
+          ''
+      end
+
+      # Return the location of all valid GRUB2 configurations on the system.
+      #
+      # @raise (Puppet::Error) if no path is found
+      #
+      # @return (Array[String]) Paths to all system GRUB2 configuration files.
+      def self.grub2_cfg_paths
+        paths = [
+          '/etc/grub2.cfg',
+          '/etc/grub2-efi.cfg',
+          "/boot/efi/EFI/#{self.os_name.downcase}/grub.cfg",
+          '/boot/grub2/grub.cfg',
+          '/boot/grub/grub.cfg'
+        ]
+
+        valid_paths = paths.map do |path|
+          begin
+            real_path = File.realpath(path)
+            real_path if (File.readable?(real_path) && !File.directory?(real_path))
+          rescue Errno::ENOENT
+            nil
+          end
+        end.compact.uniq
+
+        fail(%{No grub configuration found at '#{paths.join("', '")}'}) if valid_paths.empty?
+
+        valid_paths
+      end
+
+      # Return the location of the first discovered GRUB2 configuration.
+      #
+      # @raise (Puppet::Error) if no path is found
       #
       # @return (String) The full path to the GRUB2 configuration file.
       def self.grub2_cfg_path
-        paths = [
-          '/etc/grub2.cfg',
-          '/boot/grub/grub.cfg',
-          '/boot/grub2/grub.cfg'
-        ]
 
-        if File.exist?('/sys/firmware/efi')
-          os_info = Facter.value(:os)
-          if os_info
-            os_name = Facter.value(:os)['name']
-          else
-            # Support for old versions of Facter
-            unless os_name
-              os_name = Facter.value(:operatingsystem)
-            end
-          end
+        paths = self.grub2_cfg_paths
 
-          paths = [
-            '/etc/grub2-efi.cfg',
-            # Handle the standard EFI naming convention
-            "/boot/efi/EFI/#{os_name.downcase}/grub.cfg"
-          ] + paths
-        end
+        raise Puppet::Error, 'Could not find a GRUB2 configuration on the system' if paths.empty?
 
-        paths.each do |path|
-          return path if (File.readable?(path) && !File.directory?(path))
-        end
-
-        raise Puppet::Error, 'Could not find a GRUB2 configuration on the system'
+        paths.first
       end
 
       # Return the contents of the GRUB2 configuration on the system.
@@ -164,6 +183,30 @@ module PuppetX
       # @return (String) The contents of the GRUB2 configuration on the system.
       def self.grub2_cfg
         return File.read(grub2_cfg_path)
+      end
+
+      # Run grub2-mkconfig on all passed configurations
+      #
+      # @param mkconfig_output (String)
+      #   The output of grub2-mkconfig
+      #
+      # @param configs (Array[String])
+      #   The output target paths
+      #
+      # @raise (Puppet::Error) if an empty string is passed as the file content
+      #
+      # @return (Array[String]) Updated paths
+      def self.grub2_mkconfig(mkconfig_output, configs = self.grub2_cfg_paths)
+        fail('No output from grub2-mkconfig') if mkconfig_output.strip.empty?
+
+        configs.each do |config_path|
+          File.open(config_path, 'w') do |fh|
+            fh.puts(mkconfig_output)
+            fh.flush
+          end
+        end
+
+        configs
       end
 
       # Return a list of options that have the kernel path prepended and are
