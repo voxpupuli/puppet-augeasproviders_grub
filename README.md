@@ -26,6 +26,9 @@ normal.
 
 See [Puppet/Augeas pre-requisites](http://docs.puppetlabs.com/guides/augeas.html#pre-requisites).
 
+**WARNING** Your system must be able to run the grub mkconfig scripts with BLS
+support if you are on a systen that uses BLS!
+
 ## Installing
 
 On Puppet 2.7.14+, the module can be installed easily ([documentation](http://docs.puppetlabs.com/puppet/latest/reference/modules_installing.html)):

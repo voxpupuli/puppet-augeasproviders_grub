@@ -3,7 +3,7 @@
 # Copyright (c) 2016 Trevor Vaughan <tvaughan@onyxpoint.com>
 # Licensed under the Apache License, Version 2.0
 
-Puppet::Type.type(:grub_menuentry).provide(:grub2) do
+Puppet::Type.type(:grub_menuentry).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Provides for the manipulation of GRUB2 menuentries"
 
   has_feature :grub2
@@ -236,7 +236,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
   end
 
   def self.instances
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     @grubby_default_index ||= (grubby '--default-index').strip
 
@@ -269,7 +269,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
   def initialize(*args)
     super(*args)
 
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     @grubby_info = {}
     begin
@@ -490,6 +490,10 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
   end
 
   def flush
+    super
+
+    require 'puppetx/augeasproviders_grub/util'
+
     @property_hash[:name] = self.name
 
     if @property_hash[:kernel] =~ /(\d.+)/
@@ -536,7 +540,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
           FileUtils.rm_f(legacy_target)
 
           # Need to rebuild the full grub config if we removed a legacy target
-          grub2_mkconfig
+          PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
         end
       end
     else
@@ -568,7 +572,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
         # Need to remove the BLS config if we moved it to be legacy
         FileUtils.rm_f(bls_target) if File.exist?(bls_target)
 
-        grub2_mkconfig
+        PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
       end
     end
 
@@ -745,52 +749,5 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
     output << '}'
 
     return output
-  end
-
-  # Run the grub2-mkconfig command on the discovered file paths deconflicting
-  # across symlinks
-  def grub2_mkconfig(cfg_paths=[])
-    tgt_files = []
-
-    os_info = Facter.value(:os)
-    if os_info
-      os_name = Facter.value(:os)['name']
-    else
-      # Support for old versions of Facter
-      unless os_name
-        os_name = Facter.value(:operatingsystem)
-      end
-    end
-
-    cfg_paths = [
-      "/etc/grub2.cfg",
-      "/etc/grub2-efi.cfg",
-      # Handle the standard EFI naming convention
-      "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
-      "/boot/grub2/grub.cfg",
-      "/boot/grub/grub.cfg"
-    ] if cfg_paths.empty?
-
-    cfg_paths.each do |path|
-      begin
-        tgt_files << File.realpath(path)
-      rescue
-        next
-      end
-    end
-
-    cfg_paths = cfg_paths.select{|x| FileTest.file?(x)}
-
-    fail("Cannot find a grub configuration at any of '#{cfg_paths.join(', ')}' to use with #{command(:mkconfig)}") if cfg_paths.empty?
-
-    # This takes a while to run
-    mkconfig_output = mkconfig
-
-    tgt_files.uniq.each do |cfg_path|
-      File.open(cfg_path, 'w') do |fh|
-        fh.puts(mkconfig_output)
-        fh.flush
-      end
-    end
   end
 end

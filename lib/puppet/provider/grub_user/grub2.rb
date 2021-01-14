@@ -3,7 +3,7 @@
 # Copyright (c) 2016 Trevor Vaughan <tvaughan@onyxpoint.com>
 # Licensed under the Apache License, Version 2.0
 
-Puppet::Type.type(:grub_user).provide(:grub2) do
+Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Provides for the manipulation of GRUB2 User Entries"
 
   has_feature :grub2
@@ -21,7 +21,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
   mk_resource_methods
 
   def self.grub2_cfg
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     PuppetX::AugeasprovidersGrub::Util.grub2_cfg
   end
@@ -31,7 +31,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
   end
 
   def self.grub2_cfg_path
-    require 'puppetx/augeasproviders_grub/menuentry'
+    require 'puppetx/augeasproviders_grub/util'
 
     PuppetX::AugeasprovidersGrub::Util.grub2_cfg_path
   end
@@ -223,6 +223,8 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
   end
 
   def flush
+    super
+
     # This is to clean up the legacy file that was put in place incorrectly
     # prior to the standard 01_users configuration file
     legacy_file = '/etc/grub.d/01_puppet_managed_users'
@@ -275,7 +277,7 @@ cat << USER_LIST
     # This really shouldn't happen but could if people start adding users in other files.
     if output == @property_hash[:_target_file_content]
       err("Please ensure that your *active* GRUB2 configuration is correct. #{self.class} thinks that you need an update, but your file content did not change")
-    else output == @property_hash[:_target_file_content]
+    else
       fh = File.open(resource[:target], 'w')
       fh.puts(output)
       fh.flush
@@ -284,7 +286,8 @@ cat << USER_LIST
       FileUtils.chmod(0755, resource[:target])
     end
 
-    mkconfig "-o", grub2_cfg_path
+    require 'puppetx/augeasproviders_grub/util'
+    PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
   end
 
   private
