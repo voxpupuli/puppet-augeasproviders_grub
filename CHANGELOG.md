@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.0
+
+- Update augeasproviders_core version (#67)
+- Puppet 7 support (#64)
+- EL8.1+ support (#64)
+- Call grub2-mkconfig on all targets (#57)
+- Fix grub_menuentry issues (#55 #56 #64)
+
 ## 3.2.0
 
 - Support Puppet 6 (#42)
