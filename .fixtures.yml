@@ -1,6 +1,7 @@
+---
 fixtures:
   repositories:
-    "augeasproviders_core":
-      repo: "git://github.com/hercules-team/augeasproviders_core.git"
+    augeasproviders_core:
+      repo: "https://github.com/voxpupuli/augeasproviders_core"
   symlinks:
     augeasproviders_grub: "#{source_dir}"
