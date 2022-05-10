@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'beaker-rspec'
 require 'tmpdir'
 require 'yaml'
@@ -29,6 +31,6 @@ RSpec.configure do |c|
   c.formatter = :documentation
 
   c.before :suite do
-    copy_fixture_modules_to( hosts )
+    copy_fixture_modules_to(hosts)
   end
 end

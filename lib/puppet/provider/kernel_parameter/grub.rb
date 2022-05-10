@@ -1,25 +1,28 @@
+# frozen_string_literal: true
+
 # GRUB legacy / 0.9x support for kernel parameters
 #
 # Copyright (c) 2013 Dominic Cleal
 # Licensed under the Apache License, Version 2.0
 
-raise("Missing augeasproviders_core module dependency") if Puppet::Type.type(:augeasprovider).nil?
-Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
+# Useful XPath to match only recovery entries
+MODE_RECOVERY = "(kernel/S or kernel/1 or kernel/single or .=~regexp('.*\((single-user|recovery) mode\).*'))"
+MODE_NOT_RECOVERY = "(count(kernel/S)=0 and count(kernel/1)=0 and count(kernel/single)=0 and .!~regexp('.*\((single-user|recovery) mode\).*'))"
+MODE_DEFAULT = 'int(../default)+1'
+
+raise('Missing augeasproviders_core module dependency') if Puppet::Type.type(:augeasprovider).nil?
+
+Puppet::Type.type(:kernel_parameter).provide(:grub, parent: Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Uses Augeas API to update kernel parameters in GRUB's menu.lst"
 
   default_file do
-    FileTest.exist?("/boot/efi/EFI/redhat/grub.conf") ? "/boot/efi/EFI/redhat/grub.conf" : "/boot/grub/menu.lst"
+    FileTest.exist?('/boot/efi/EFI/redhat/grub.conf') ? '/boot/efi/EFI/redhat/grub.conf' : '/boot/grub/menu.lst'
   end
 
   lens { 'Grub.lns' }
 
-  confine :feature => :augeas
-  defaultfor :augeasprovider_grub_version => 1
-
-  # Useful XPath to match only recovery entries
-  MODE_RECOVERY = "(kernel/S or kernel/1 or kernel/single or .=~regexp('.*\((single-user|recovery) mode\).*'))"
-  MODE_NOT_RECOVERY = "(count(kernel/S)=0 and count(kernel/1)=0 and count(kernel/single)=0 and .!~regexp('.*\((single-user|recovery) mode\).*'))"
-  MODE_DEFAULT = "int(../default)+1"
+  confine feature: :augeas
+  defaultfor augeasprovider_grub_version: 1
 
   def title_filter
     case resource[:bootmode]
@@ -30,7 +33,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
     when :default
       "[#{MODE_DEFAULT}]"
     else
-      ""
+      ''
     end
   end
 
@@ -38,28 +41,28 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
     augopen do |aug|
       resources = []
       # Get all unique parameter names
-      params = aug.match("$target/title/kernel/*").map {|pp| pp.split("/")[-1].split("[")[0] }.uniq
+      params = aug.match('$target/title/kernel/*').map { |pp| pp.split('/')[-1].split('[')[0] }.uniq
 
       params.each do |pp|
         # Then retrieve all unique values as string (1) or array
-        vals = aug.match("$target/title/kernel/#{pp}").map {|vp| aug.get(vp) }.uniq
+        vals = aug.match("$target/title/kernel/#{pp}").map { |vp| aug.get(vp) }.uniq
         vals = vals[0] if vals.size == 1
 
-        param = {:ensure => :present, :name => pp, :value => vals}
+        param = { ensure: :present, name: pp, value: vals }
 
         # Check if this param is used in recovery entries too, irrespective of value
         is_def = !aug.match("$target/title[#{MODE_DEFAULT}]/kernel/#{pp}").empty?
         is_recv = !aug.match("$target/title[#{MODE_RECOVERY} and kernel/#{pp}]").empty?
         is_norm = !aug.match("$target/title[#{MODE_NOT_RECOVERY} and kernel/#{pp}]").empty?
-        if is_def && is_recv && is_norm
-          param[:bootmode] = :all
-        elsif is_recv
-          param[:bootmode] = :recovery
-        elsif is_def
-          param[:bootmode] = :default
-        else
-          param[:bootmode] = :normal
-        end
+        param[:bootmode] = if is_def && is_recv && is_norm
+                             :all
+                           elsif is_recv
+                             :recovery
+                           elsif is_def
+                             :default
+                           else
+                             :normal
+                           end
 
         resources << new(param)
       end
@@ -72,7 +75,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
       if resource[:ensure] == :absent
         # Existence is specific - if it exists on any kernel, so it gets destroyed
         !aug.match("$target/title#{title_filter}/kernel/#{resource[:name]}").empty?
-      else  # if present
+      else # if present
         # Existence is specific - it must exist on all kernels, or we'll fix it
         !aug.match("$target/title#{title_filter}/kernel").find do |kpath|
           aug.match("#{kpath}/#{resource[:name]}").empty?
@@ -82,7 +85,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
   end
 
   def create
-    self.value=(resource[:value])
+    self.value = (resource[:value])
   end
 
   def destroy
@@ -93,7 +96,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
 
   def value
     augopen do |aug|
-      aug.match("$target/title#{title_filter}/kernel/#{resource[:name]}").map {|p| aug.get(p) }.uniq
+      aug.match("$target/title#{title_filter}/kernel/#{resource[:name]}").map { |p| aug.get(p) }.uniq
     end
   end
 
@@ -122,10 +125,10 @@ Puppet::Type.type(:kernel_parameter).provide(:grub, :parent => Puppet::Type.type
         end
 
         # Add new parameters where there are more values than existing params
-        if vals && !vals.empty?
-          vals.each do |val|
-            aug.set("#{kpath}/#{resource[:name]}[last()+1]", val)
-          end
+        next unless vals && !vals.empty?
+
+        vals.each do |val|
+          aug.set("#{kpath}/#{resource[:name]}[last()+1]", val)
         end
       end
     end

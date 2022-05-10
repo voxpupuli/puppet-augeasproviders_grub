@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 # GRUB2 support for User Entries
 #
 # Copyright (c) 2016 Trevor Vaughan <tvaughan@onyxpoint.com>
 # Licensed under the Apache License, Version 2.0
 
-Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
-  desc "Provides for the manipulation of GRUB2 User Entries"
+Puppet::Type.type(:grub_user).provide(:grub2, parent: Puppet::Type.type(:augeasprovider).provider(:default)) do
+  desc 'Provides for the manipulation of GRUB2 User Entries'
 
   has_feature :grub2
 
   def self.mkconfig_path
-    which("grub2-mkconfig") or which("grub-mkconfig") or '/usr/sbin/grub-mkconfig'
+    which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  commands :mkconfig => mkconfig_path
+  commands mkconfig: mkconfig_path
 
-  confine :exists => '/etc/grub.d'
+  confine exists: '/etc/grub.d'
 
-  defaultfor :osfamily => :RedHat
+  defaultfor osfamily: :RedHat
 
   mk_resource_methods
 
@@ -45,10 +47,11 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     users = {}
 
     content.each_line do |line|
-      if line =~ /set\s+superusers=(?:'|")(.+?)(:?'|")/
-        superusers = $1.strip.split(/\s|,|;|\||&/)
-      elsif line =~ /password(?:_pbkdf2)?\s+(.*)/
-        user,password = $1.split(/\s+/)
+      case line
+      when %r{set\s+superusers=(?:'|")(.+?)(:?'|")}
+        superusers = Regexp.last_match(1).strip.split(%r{\s|,|;|\||&})
+      when %r{password(?:_pbkdf2)?\s+(.*)}
+        user, password = Regexp.last_match(1).split(%r{\s+})
         users[user] = password
       end
     end
@@ -60,16 +63,16 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
       new_resource[:ensure] = :present
       new_resource[:password] = users[user]
 
-      if superusers && superusers.include?(user)
-        new_resource[:superuser] = :true
-      else
-        new_resource[:superuser] = :false
-      end
+      new_resource[:superuser] = if superusers&.include?(user)
+                                   :true
+                                 else
+                                   :false
+                                 end
 
       resources << new_resource
     end
 
-    return resources
+    resources
   end
 
   def self.instances
@@ -78,14 +81,14 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
 
     all_users = extract_users(grub2_cfg)
 
-    @instance_array = all_users.collect{|x| x = new(x)}
+    @instance_array = all_users.map { |x| new(x) }
 
-    return @instance_array
+    @instance_array
   end
 
   def self.prefetch(resources)
     instances.each do |prov|
-      if resource = resources[prov.name]
+      if (resource = resources[prov.name])
         resource.provider = prov
       end
     end
@@ -95,15 +98,13 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     return if @already_reported
 
     # Report on users that aren't being managed by Puppet
-    unmanaged_users = instances.select do |x|
-      !property_hash[:_all_grub_resource_users].include?(x.name)
+    unmanaged_users = instances.reject do |x|
+      property_hash[:_all_grub_resource_users].include?(x.name)
     end
 
-    unmanaged_users.map!{|x| x = x.name}
+    unmanaged_users.map!(&:name)
 
-    unless (property_hash[:ignore_unmanaged_users] == :true) && unmanaged_users.empty?
-      warn(%(The following GRUB2 users are present but not managed by Puppet: "#{unmanaged_users.join('", "')}"))
-    end
+    warn(%(The following GRUB2 users are present but not managed by Puppet: "#{unmanaged_users.join('", "')}")) unless (property_hash[:ignore_unmanaged_users] == :true) && unmanaged_users.empty?
 
     @already_reported = true
   end
@@ -114,23 +115,20 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     @already_reported = nil
   end
 
-  def initialize(args)
-    super
-  end
-
   def exists?
     # Make sure that we don't have any issues with the file.
     if File.exist?(resource[:target])
-      unless File.file?(resource[:target]) && File.readable?(resource[:target])
-        raise(Puppet::Error, "'#{resource[:target]}' exists but is not a readable file")
-      end
+      raise(Puppet::Error, "'#{resource[:target]}' exists but is not a readable file") unless File.file?(resource[:target]) && File.readable?(resource[:target])
 
       # Save this for later so that we don't write the file if it doesn't need it.
       @property_hash[:_target_file_content] = File.read(resource[:target]).strip
-      @property_hash[:_existing_users] = self.class.extract_users(@property_hash[:_target_file_content]).collect{|x| x[:_puppet_managed] = true; x}
+      @property_hash[:_existing_users] = self.class.extract_users(@property_hash[:_target_file_content]).map do |x|
+        x[:_puppet_managed] = true
+        x
+      end
 
       # We don't want to duplicate our current entry
-      current_index = @property_hash[:_existing_users].index{|x| x[:name] == resource[:name]}
+      current_index = @property_hash[:_existing_users].index { |x| x[:name] == resource[:name] }
       if current_index
         @property_hash[:_puppet_managed] = true
         @property_hash[:_existing_users].delete_at(current_index)
@@ -144,17 +142,9 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     #
     # It only applies if we actually are performing a catalog run.
     @property_hash[:_all_grub_resource_users] = []
-    if resource.catalog
-      @property_hash[:_all_grub_resource_users] = resource.catalog.resources.select{|x|
-        x.type == :grub_user
-      }.map{|x|
-        x = x[:name]
-      }
-    end
+    @property_hash[:_all_grub_resource_users] = resource.catalog.resources.select { |x| x.type == :grub_user }.map { |x| x[:name] } if resource.catalog
 
-    if resource[:report_unmanaged] == :true
-      self.class.report_unmanaged_users(@property_hash)
-    end
+    self.class.report_unmanaged_users(@property_hash) if resource[:report_unmanaged] == :true
 
     # Get the password into a sane format before proceeding
 
@@ -163,7 +153,8 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
 
   def create
     # Input Validation
-    fail(Puppet::Error, '`password` is a required property') unless (@property_hash[:password] || resource[:password])
+    raise(Puppet::Error, '`password` is a required property') unless @property_hash[:password] || resource[:password]
+
     # End Validation
 
     @property_hash = resource.to_hash.merge(@property_hash)
@@ -174,41 +165,41 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     @property_hash[:_puppet_managed] = false
   end
 
-  def password?(is,should)
-    if is =~ /^grub\.pbkdf2\.\S+\.(\d+)/
-      is_rounds = $1
+  def password?(is, should)
+    if is =~ %r{^grub\.pbkdf2\.\S+\.(\d+)}
+      is_rounds = Regexp.last_match(1)
 
-      if should =~ /^grub\.pbkdf2\.\S+\.(\d+)/
-        should_rounds = $1
+      if should =~ %r{^grub\.pbkdf2\.\S+\.(\d+)}
+        should_rounds = Regexp.last_match(1)
 
         return (is == should) && (is_rounds == should_rounds)
-      else
-        return validate_pbkdf2(should,is)
       end
+
+      return validate_pbkdf2(should, is)
     end
 
-    if should =~ /^grub\.pbkdf2\.\S+\.(\d+)/
-      should_rounds = $1
+    if should =~ %r{^grub\.pbkdf2\.\S+\.(\d+)}
+      should_rounds = Regexp.last_match(1)
 
-      if is =~ /^grub\.pbkdf2\.\S+\.(\d+)/
-        is_rounds = $1
+      if is =~ %r{^grub\.pbkdf2\.\S+\.(\d+)}
+        is_rounds = Regexp.last_match(1)
 
         return (is == should) && (is_rounds == should_rounds)
-      else
-        return validate_pbkdf2(is,should)
       end
+
+      return validate_pbkdf2(is, should)
     else
       should = mkpasswd_pbkdf2(should, nil, resource[:rounds])
     end
 
-    return is == should
+    is == should
   end
 
   def purge
     users_to_purge = []
     if resource[:purge] == :true
       (@property_hash[:_existing_users] + [@property_hash]).each do |user|
-        unless (user[:_puppet_managed] && @property_hash[:_all_grub_resource_users].include?(user[:name]))
+        unless user[:_puppet_managed] && @property_hash[:_all_grub_resource_users].include?(user[:name])
           # Found something to purge!
           users_to_purge << user[:name]
         end
@@ -216,9 +207,9 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     end
 
     if users_to_purge.empty?
-      return resource[:purge]
+      resource[:purge]
     else
-      return %(Purged GRUB2 users: "#{users_to_purge.join('", "')}")
+      %(Purged GRUB2 users: "#{users_to_purge.join('", "')}")
     end
   end
 
@@ -228,36 +219,30 @@ Puppet::Type.type(:grub_user).provide(:grub2, :parent => Puppet::Type.type(:auge
     # This is to clean up the legacy file that was put in place incorrectly
     # prior to the standard 01_users configuration file
     legacy_file = '/etc/grub.d/01_puppet_managed_users'
-    unless resource[:target] == legacy_file
-      File.unlink(legacy_file) if File.exist?(legacy_file)
-    end
+    File.unlink(legacy_file) if resource[:target] != legacy_file && File.exist?(legacy_file)
 
     output = []
 
-    output << <<-EOM
-#!/bin/sh
-########
-# This file managed by Puppet
-# Manual changes will be erased!
-########
-cat << USER_LIST
+    output << <<~EOM
+      #!/bin/sh
+      ########
+      # This file managed by Puppet
+      # Manual changes will be erased!
+      ########
+      cat << USER_LIST
     EOM
 
     # Build the password file
-    superusers = @property_hash[:_existing_users].select{|x| x[:superuser] == :true}.map{|x| x = x[:name]}
-    if @property_hash[:_puppet_managed] && (@property_hash[:superuser] == :true)
-      superusers << @property_hash[:name]
-    end
+    superusers = @property_hash[:_existing_users].select { |x| x[:superuser] == :true }.map { |x| x[:name] }
+    superusers << @property_hash[:name] if @property_hash[:_puppet_managed] && (@property_hash[:superuser] == :true)
 
     # First, prepare the superusers line.
-    unless superusers.empty?
-      output << %(set superusers="#{superusers.uniq.sort.join(',')}")
-    end
+    output << %(set superusers="#{superusers.uniq.sort.join(',')}") unless superusers.empty?
 
     # Now, prepare our user list
     users = []
     # Need to keep our output order consistent!
-    (@property_hash[:_existing_users] + [@property_hash]).sort_by{|x| x[:name]}.each do |user|
+    (@property_hash[:_existing_users] + [@property_hash]).sort_by { |x| x[:name] }.each do |user|
       if resource[:purge] == :true
         if user[:_puppet_managed] && @property_hash[:_all_grub_resource_users].include?(user[:name])
           users << format_user_entry(user)
@@ -265,7 +250,7 @@ cat << USER_LIST
           debug("Purging GRUB2 User #{user[:name]}")
         end
       else
-        users <<  format_user_entry(user)
+        users << format_user_entry(user)
       end
     end
 
@@ -283,7 +268,7 @@ cat << USER_LIST
       fh.flush
       fh.close
 
-      FileUtils.chmod(0755, resource[:target])
+      FileUtils.chmod(0o755, resource[:target])
     end
 
     require 'puppetx/augeasproviders_grub/util'
@@ -295,47 +280,42 @@ cat << USER_LIST
   def format_user_entry(user_hash)
     password = user_hash[:password]
 
-    unless password =~ /^grub\.pbkdf2/
-      password = mkpasswd_pbkdf2(password, nil, resource[:rounds])
-    end
+    password = mkpasswd_pbkdf2(password, nil, resource[:rounds]) unless password =~ %r{^grub\.pbkdf2}
 
-    user_entry = %(password_pbkdf2 #{user_hash[:name]} #{password})
-
-    return user_entry
+    %(password_pbkdf2 #{user_hash[:name]} #{password})
   end
 
   def pack_salt(salt)
-    return salt.scan(/../).map{|x| x.hex }.pack('c*')
+    salt.scan(%r{..}).map(&:hex).pack('c*')
   end
 
   def unpack_salt(salt)
-    return salt.unpack('H*').first.upcase
+    salt.unpack1('H*').upcase
   end
 
-  def mkpasswd_pbkdf2(password, salt, rounds=10000)
-    salt ||= (0...63).map{|x| x = (65 + rand(26)).chr }.join
+  def mkpasswd_pbkdf2(password, salt, rounds = 10_000)
+    salt ||= (0...63).map { |_x| rand(65..90).chr }.join
 
     require 'openssl'
 
-    digest = OpenSSL::Digest::SHA512.new
+    digest = OpenSSL::Digest.new('SHA512')
 
-    hashed_password = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, rounds, digest.digest_length, digest).unpack('H*').first.upcase
+    hashed_password = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, rounds, digest.digest_length, digest).unpack1('H*').upcase
 
-    return "grub.pbkdf2.sha512.#{rounds}.#{unpack_salt(salt)}.#{hashed_password}"
+    "grub.pbkdf2.sha512.#{rounds}.#{unpack_salt(salt)}.#{hashed_password}"
   end
 
   def validate_pbkdf2(password, pbkdf2_hash)
-    if pbkdf2_hash =~ /(grub\.pbkdf2.*)/
-      pbkdf2_hash = $1
-    else
-      raise "Error: No valid GRUB2 PBKDF2 password hash found"
+    if pbkdf2_hash =~ %r{(grub\.pbkdf2.*)}
+      pbkdf2_hash = Regexp.last_match(1)
+      raise 'Error: No valid GRUB2 PBKDF2 password hash found' unless pbkdf2_hash
     end
 
-    id, type, algorithm, rounds, hashed_salt, hashed_password = pbkdf2_hash.split('.')
+    _id, _type, _algorithm, rounds, hashed_salt, hashed_password = pbkdf2_hash.split('.')
     rounds = rounds.to_i
 
     salt = pack_salt(hashed_salt)
 
-    return "grub.pbkdf2.sha512.#{rounds}.#{hashed_salt}.#{hashed_password}" == mkpasswd_pbkdf2(password, salt, rounds)
+    "grub.pbkdf2.sha512.#{rounds}.#{hashed_salt}.#{hashed_password}" == mkpasswd_pbkdf2(password, salt, rounds)
   end
 end

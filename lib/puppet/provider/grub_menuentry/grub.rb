@@ -1,28 +1,31 @@
+# frozen_string_literal: true
+
 # GRUB legacy / 0.9x support for menu entries
 #
 # Copyright (c) 2016 Trevor Vaughan <tvaughan@onyxpoint.com>
 # Licensed under the Apache License, Version 2.0
 # Based on work by Dominic Cleal
 
-raise("Missing augeasproviders_core module dependency") if Puppet::Type.type(:augeasprovider).nil?
-Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
-  desc "Uses Augeas API to update GRUB menu entries"
+raise('Missing augeasproviders_core module dependency') if Puppet::Type.type(:augeasprovider).nil?
+
+Puppet::Type.type(:grub_menuentry).provide(:grub, parent: Puppet::Type.type(:augeasprovider).provider(:default)) do
+  desc 'Uses Augeas API to update GRUB menu entries'
 
   has_feature :grub
 
   default_file do
-    FileTest.exist?("/boot/efi/EFI/redhat/grub.conf") ? "/boot/efi/EFI/redhat/grub.conf" : "/boot/grub/menu.lst"
+    FileTest.exist?('/boot/efi/EFI/redhat/grub.conf') ? '/boot/efi/EFI/redhat/grub.conf' : '/boot/grub/menu.lst'
   end
 
   lens { 'Grub.lns' }
 
-  confine :feature => :augeas
-  commands :grub => 'grub'
-  commands :grubby => 'grubby'
+  confine feature: :augeas
+  commands grub: 'grub'
+  commands grubby: 'grubby'
 
   #### Class Methods
 
-  #Pull the kernel options off of the system and arrange them properly
+  # Pull the kernel options off of the system and arrange them properly
   # into the Array of Arrays.
   #
   # @param aug (Augeas) the Augeas tree object
@@ -34,11 +37,11 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
       kopt_val = aug.get(kopt)
       kopt = kopt.split('/').last.split('[').first
 
-      if kopt_val
-        kernel_options << "#{kopt}=#{kopt_val}"
-      else
-        kernel_options << kopt
-      end
+      kernel_options << if kopt_val
+                          "#{kopt}=#{kopt_val}"
+                        else
+                          kopt
+                        end
     end
 
     kernel_options
@@ -64,11 +67,11 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
           mod_opt_val = aug.get(mod_opt)
           mod_opt = mod_opt.split('/').last.split('[').first
 
-          if mod_opt_val
-            new_mod << "#{mod_opt}=#{mod_opt_val}"
-          else
-            new_mod << mod_opt
-          end
+          new_mod << if mod_opt_val
+                       "#{mod_opt}=#{mod_opt_val}"
+                     else
+                       mod_opt
+                     end
         end
 
         modules << new_mod
@@ -84,7 +87,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     resources = []
 
     augopen do |aug|
-      menu_entries = aug.match("$target/title")
+      menu_entries = aug.match('$target/title')
 
       menu_entries.each do |pp|
         # Then retrieve all unique values as string (1) or array
@@ -92,16 +95,16 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
         kernel = aug.get("#{pp}/kernel")
         initrd = aug.get("#{pp}/initrd")
         fs_root = aug.get("#{pp}/root")
-        default_entry = ((aug.get("$target/default") || '0').to_i + 1)
+        default_entry = ((aug.get('$target/default') || '0').to_i + 1)
 
         modules = self.class.get_modules(aug, pp)
 
         resource = {
-          :name          => entry_name,
-          :ensure        => :present,
-          :root          => fs_root,
-          :default_entry => (pp.split('[').last[0].chr == default_entry),
-          :makeactive    => aug.exists("#{pp}/makeactive")
+          name: entry_name,
+          ensure: :present,
+          root: fs_root,
+          default_entry: (pp.split('[').last[0].chr == default_entry),
+          makeactive: aug.exists("#{pp}/makeactive")
         }
 
         if kernel
@@ -109,18 +112,12 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
           kernel_options = self.class.get_kernel_options(aug, pp)
 
-          if kernel_options && !kernel_options.empty?
-            resource[:kernel_options] = kernel_options
-          end
+          resource[:kernel_options] = kernel_options if kernel_options && !kernel_options.empty?
         end
 
-        if initrd
-          resource[:initrd] = initrd
-        end
+        resource[:initrd] = initrd if initrd
 
-        if modules && !modules.empty?
-          resource[:modules] = modules
-        end
+        resource[:modules] = modules if modules && !modules.empty?
 
         resources << new(resource)
       end
@@ -130,7 +127,6 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
   end
   #### End Class Methods
 
-
   def initialize(*args)
     require 'puppetx/augeasproviders_grub/util'
 
@@ -139,7 +135,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
       grubby_raw = grubby '--info=DEFAULT'
 
       grubby_raw.each_line do |opt|
-        key,val = opt.split('=')
+        key, val = opt.split('=')
 
         @grubby_info[key.strip] = val.strip
       end
@@ -155,15 +151,15 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
     # We need to record these here in case they get changed in the future.
     augopen do |aug|
-      default_entry_index = ((aug.get("$target/default") || '0').to_i + 1).to_s
+      default_entry_index = ((aug.get('$target/default') || '0').to_i + 1).to_s
       default_entry_path  = %($target/title[#{default_entry_index}])
 
       @default_entry = {
-        :path           => default_entry_path,
-        :index          => default_entry_index,
-        :kernel_options => self.class.get_kernel_options(aug, default_entry_path),
-        :kernel         => @grubby_info['kernel'],
-        :initrd         => @grubby_info['initrd']
+        path: default_entry_path,
+        index: default_entry_index,
+        kernel_options: self.class.get_kernel_options(aug, default_entry_path),
+        kernel: @grubby_info['kernel'],
+        initrd: @grubby_info['initrd']
       }
     end
   end
@@ -176,52 +172,46 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
   def create
     # Input Validation
-    fail Puppet::Error, '`kernel` is a required property' unless resource[:kernel]
-    fail Puppet::Error, '`root` is a required property' unless resource[:root]
+    raise Puppet::Error, '`kernel` is a required property' unless resource[:kernel]
+    raise Puppet::Error, '`root` is a required property' unless resource[:root]
 
-    unless resource[:modules]
-      fail Puppet::Error, '`initrd` is a required parameter' unless resource[:initrd]
-    end
+    raise Puppet::Error, '`initrd` is a required parameter' if !resource[:modules] && !resource[:initrd]
 
     augopen! do |aug|
-      aug.insert('$target/title[1]','title',true)
-      aug.set('$target/title[1]',resource[:name])
+      aug.insert('$target/title[1]', 'title', true)
+      aug.set('$target/title[1]', resource[:name])
     end
 
     # Order matters!
-    self.root=(resource[:root])
+    self.root = (resource[:root])
 
     # Need to prime this to reduce duplication later
-    self.kernel?([],resource[:kernel])
-    self.kernel=(resource[:kernel])
+    kernel?([], resource[:kernel])
+    self.kernel = (resource[:kernel])
 
     if resource[:kernel_options]
       # Need to prime this to reduce duplication later
-      self.kernel_options?([],resource[:kernel_options])
-      self.kernel_options=(resource[:kernel_options])
+      kernel_options?([], resource[:kernel_options])
+      self.kernel_options = (resource[:kernel_options])
     end
 
     if resource[:initrd]
       # Need to prime this to reduce duplication later
-      self.initrd?([],resource[:initrd])
-      self.initrd=(resource[:initrd])
+      initrd?([], resource[:initrd])
+      self.initrd = (resource[:initrd])
     end
 
     if resource[:modules]
       # Need to prime this to reduce duplication later
-      self.modules?([],resource[:modules])
-      self.modules=(resource[:modules])
+      modules?([], resource[:modules])
+      self.modules = (resource[:modules])
     end
 
     # Broken in the lens
-    #self.lock=(resource[:lock])
-    if resource[:makeactive]
-      self.makeactive=(resource[:makeactive])
-    end
+    # self.lock=(resource[:lock])
+    self.makeactive = (resource[:makeactive]) if resource[:makeactive]
 
-    if resource[:default_entry]
-      self.default_entry=(resource[:default_entry])
-    end
+    self.default_entry = (resource[:default_entry]) if resource[:default_entry]
   end
 
   def destroy
@@ -236,7 +226,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     end
   end
 
-  def root?(is,should)
+  def root?(is, should)
     is == should
   end
 
@@ -250,7 +240,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     menu_entry_index == @default_entry[:index]
   end
 
-  def default_entry=(newval)
+  def default_entry=(_newval)
     augopen! do |aug|
       aug.set('$target/default', (menu_entry_index.to_i - 1).to_s)
     end
@@ -262,32 +252,26 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     end
   end
 
-  def initrd?(is,should)
+  def initrd?(is, should)
     return true unless should
 
     @new_initrd = should
 
     if @new_initrd == ':preserve:'
       @new_initrd = is
-      if !@new_initrd || @new_initrd.empty?
-        @new_initrd = ':default:'
-      end
+      @new_initrd = ':default:' if !@new_initrd || @new_initrd.empty?
     end
 
-    if @new_initrd == ':default:'
-      @new_initrd = PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_initrd, 'initrd', @grubby_info)
-    end
+    @new_initrd = PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_initrd, 'initrd', @grubby_info) if @new_initrd == ':default:'
 
-    unless @new_initrd
-      raise Puppet::Error, 'Could not find a valid initrd value to set'
-    end
+    raise Puppet::Error, 'Could not find a valid initrd value to set' unless @new_initrd
 
     is == @new_initrd
   end
 
-  def initrd=(newval)
+  def initrd=(_newval)
     augopen! do |aug|
-      aug.set("#{menu_entry_path}/initrd",PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_initrd,'initrd',@grubby_info))
+      aug.set("#{menu_entry_path}/initrd", PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_initrd, 'initrd', @grubby_info))
     end
   end
 
@@ -297,32 +281,26 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     end
   end
 
-  def kernel?(is,should)
+  def kernel?(is, should)
     return true unless should
 
     @new_kernel = should
 
     if @new_kernel == ':preserve:'
       @new_kernel = is
-      if !@new_kernel || @new_kernel.empty?
-        @new_kernel = ':default:'
-      end
+      @new_kernel = ':default:' if !@new_kernel || @new_kernel.empty?
     end
 
-    if @new_kernel == ':default:'
-      @new_kernel = PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_kernel, 'kernel', @grubby_info)
-    end
+    @new_kernel = PuppetX::AugeasprovidersGrub::Util.munge_grubby_value(@new_kernel, 'kernel', @grubby_info) if @new_kernel == ':default:'
 
-    unless @new_kernel
-      raise Puppet::Error, 'Could not find a valid kernel value to set'
-    end
+    raise Puppet::Error, 'Could not find a valid kernel value to set' unless @new_kernel
 
     is == @new_kernel
   end
 
-  def kernel=(newval)
+  def kernel=(_newval)
     augopen! do |aug|
-      aug.set("#{menu_entry_path}/kernel",@new_kernel)
+      aug.set("#{menu_entry_path}/kernel", @new_kernel)
     end
   end
 
@@ -332,10 +310,8 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     end
   end
 
-  def kernel_options?(is,should)
-    if resource[:add_defaults_on_creation] && should.include?(':preserve:')
-      should << ':defaults:'
-    end
+  def kernel_options?(is, should)
+    should << ':defaults:' if resource[:add_defaults_on_creation] && should.include?(':preserve:')
 
     default_kernel_options = @default_entry[:kernel_options]
     if resource[:modules]
@@ -358,11 +334,9 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
       default_kernel_options = {}
     end
 
-    if Array(new_kernel_options).empty?
-      new_kernel_options = PuppetX::AugeasprovidersGrub::Util.munged_options([], newval, @default_entry[:kernel], default_kernel_options)
-    end
+    new_kernel_options = PuppetX::AugeasprovidersGrub::Util.munged_options([], newval, @default_entry[:kernel], default_kernel_options) if Array(new_kernel_options).empty?
 
-    process_option_line(new_kernel_options,'kernel')
+    process_option_line(new_kernel_options, 'kernel')
   end
 
   def modules
@@ -371,27 +345,23 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
     end
   end
 
-  def modules?(is,should)
+  def modules?(is, should)
     @new_modules_options = []
     old_options = []
 
     i = 0
     Array(should).each do |module_set|
-      if resource[:add_defaults_on_creation] && module_set.include?(':preserve:')
-        module_set << ':defaults:'
-      end
+      module_set << ':defaults:' if resource[:add_defaults_on_creation] && module_set.include?(':preserve:')
 
       current_val = Array(Array(is)[i])
       @new_modules_options << PuppetX::AugeasprovidersGrub::Util.munged_options(current_val, module_set, @default_entry[:kernel], @default_entry[:kernel_options], true)
 
-      unless current_val.empty?
-        old_options << PuppetX::AugeasprovidersGrub::Util.munged_options(current_val,':preserve:', @default_entry[:kernel], @default_entry[:kernel_options], true)
-      end
+      old_options << PuppetX::AugeasprovidersGrub::Util.munged_options(current_val, ':preserve:', @default_entry[:kernel], @default_entry[:kernel_options], true) unless current_val.empty?
 
       i += 1
     end
 
-    return old_options == @new_modules_options
+    old_options == @new_modules_options
   end
 
   def modules=(newval)
@@ -404,7 +374,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
       end
     end
 
-    process_option_line(new_modules_options,'module')
+    process_option_line(new_modules_options, 'module')
   end
 
   def lock=(newval)
@@ -435,6 +405,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
 
   # Helper Methods
   private
+
   # Handles 'kernel'-style option lines
   # Probably not foolproof...
   def process_option_line(newval, flavor)
@@ -455,16 +426,16 @@ Puppet::Type.type(:grub_menuentry).provide(:grub, :parent => Puppet::Type.type(:
         end
 
         Array(opt_array).each do |base_opts|
-          opt,val = base_opts.split('=')
+          opt, val = base_opts.split('=')
 
-          aug.set("#{menu_entry_path}/#{flavor}[last()]/#{opt}[last()+1]",val)
+          aug.set("#{menu_entry_path}/#{flavor}[last()]/#{opt}[last()+1]", val)
         end
       end
     end
   end
 
   def menu_entry_path
-    return %($target/title[. = "#{resource[:name]}"])
+    %($target/title[. = "#{resource[:name]}"])
   end
 
   def menu_entry_index

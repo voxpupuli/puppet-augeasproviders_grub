@@ -1,11 +1,11 @@
+# frozen_string_literal: true
+
 Facter.add(:augeasprovider_grub_version) do
   version =
-    if File.exists?('/etc/default/grub')
+    if File.exist?('/etc/default/grub')
       2
-    elsif File.exists?('/boot/efi/EFI/redhat/grub.conf') || File.exists?('/boot/grub/menu.lst')
+    elsif File.exist?('/boot/efi/EFI/redhat/grub.conf') || File.exist?('/boot/grub/menu.lst')
       1
-    else
-      nil
     end
 
   setcode { version }

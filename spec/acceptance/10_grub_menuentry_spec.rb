@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 test_name 'Augeasproviders Grub'
@@ -5,7 +7,8 @@ test_name 'Augeasproviders Grub'
 describe 'GRUB Menuentry Tests' do
   hosts_with_role(hosts, 'grub').each do |host|
     context 'set new default kernel in GRUB Legacy' do
-      let(:manifest) { %(
+      let(:manifest) do
+        %(
         grub_menuentry { 'Standard':
           default_entry  => true,
           root           => '(hd0,0)',
@@ -13,34 +16,36 @@ describe 'GRUB Menuentry Tests' do
           initrd         => ':preserve:',
           kernel_options => [':preserve:', 'iam=GROOT']
         }
-      )}
+      )
+      end
 
       # Using puppet_apply as a helper
-      it 'should work with no errors' do
-        apply_manifest_on(host, manifest, :catch_failures => true)
+      it 'works with no errors' do
+        apply_manifest_on(host, manifest, catch_failures: true)
       end
 
-      it 'should be idempotent' do
-        apply_manifest_on(host, manifest, {:catch_changes => true})
+      it 'is idempotent' do
+        apply_manifest_on(host, manifest, { catch_changes: true })
       end
 
-      it 'should have set the default to the new entry' do
+      it 'has set the default to the new entry' do
         result = on(host, %(grubby --info=DEFAULT | grep 'args=')).stdout
-        expect(result).to match(/iam=GROOT/)
+        expect(result).to match(%r{iam=GROOT})
       end
 
-      it 'should activate on reboot' do
+      it 'activates on reboot' do
         host.reboot
 
         result = on(host, %(cat /proc/cmdline)).stdout
-        expect(result.split(/\s+/)).to include('iam=GROOT')
+        expect(result.split(%r{\s+})).to include('iam=GROOT')
       end
     end
   end
 
   hosts_with_role(hosts, 'grub2').each do |host|
     context 'set new default kernel in GRUB2' do
-      let(:manifest) { %(
+      let(:manifest) do
+        %(
         grub_menuentry { 'Standard':
           default_entry  => true,
           root           => '(hd0,msdos1)',
@@ -48,34 +53,35 @@ describe 'GRUB Menuentry Tests' do
           initrd         => ':preserve:',
           kernel_options => [':preserve:', 'trogdor=BURNINATE']
         }
-      )}
+      )
+      end
 
       # Using puppet_apply as a helper
-      it 'should work with no errors' do
-        apply_manifest_on(host, manifest, :catch_failures => true)
+      it 'works with no errors' do
+        apply_manifest_on(host, manifest, catch_failures: true)
       end
 
-      it 'should be idempotent' do
-        apply_manifest_on(host, manifest, {:catch_changes => true})
+      it 'is idempotent' do
+        apply_manifest_on(host, manifest, { catch_changes: true })
       end
 
-      it 'should have set the default to the new entry' do
+      it 'has set the default to the new entry' do
         result = on(host, %(grubby --info=DEFAULT)).stdout
         result_hash = {}
         result.each_line do |line|
-          line =~ /^\s*(.*?)=(.*)\s*$/
-          result_hash[$1.strip] = $2.strip
+          line =~ %r{^\s*(.*?)=(.*)\s*$}
+          result_hash[Regexp.last_match(1).strip] = Regexp.last_match(2).strip
         end
 
         expect(result_hash['title'].delete('"')).to eq('Standard')
         expect(result_hash['args'].delete('"')).to include('trogdor=BURNINATE')
       end
 
-      it 'should activate on reboot' do
+      it 'activates on reboot' do
         host.reboot
 
         result = on(host, %(cat /proc/cmdline)).stdout
-        expect(result.split(/\s+/)).to include('trogdor=BURNINATE')
+        expect(result.split(%r{\s+})).to include('trogdor=BURNINATE')
       end
     end
   end
