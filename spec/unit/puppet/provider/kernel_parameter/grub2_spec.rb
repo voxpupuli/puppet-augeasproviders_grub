@@ -9,42 +9,42 @@ FILTER = "*[label() =~ regexp('GRUB_CMDLINE_LINUX.*')]"
 
 describe provider_class do
   it 'finds grub2-mkconfig' do
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
-    FileTest.stubs(:file?).with('/usr/sbin/grub2-mkconfig').returns true
-    FileTest.stubs(:executable?).with('/usr/sbin/grub2-mkconfig').returns true
-    provider_class.mkconfig_path.should == '/usr/sbin/grub2-mkconfig'
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    allow(FileTest).to receive(:file?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+    allow(FileTest).to receive(:executable?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+    expect(provider_class.mkconfig_path).to eq '/usr/sbin/grub2-mkconfig'
   end
 
   it 'finds grub-mkconfig' do
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
-    FileTest.stubs(:file?).with('/usr/sbin/grub-mkconfig').returns true
-    FileTest.stubs(:executable?).with('/usr/sbin/grub-mkconfig').returns true
-    provider_class.mkconfig_path.should == '/usr/sbin/grub-mkconfig'
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    allow(FileTest).to receive(:file?).with('/usr/sbin/grub-mkconfig').and_return(true)
+    allow(FileTest).to receive(:executable?).with('/usr/sbin/grub-mkconfig').and_return(true)
+    expect(provider_class.mkconfig_path).to eq '/usr/sbin/grub-mkconfig'
   end
 end
 
 describe provider_class do
   before do
     Facter.clear
-    Facter.stubs(:fact).with(:augeasprovider_grub_version).returns Facter.add(:augeasprovider_grub_version) { setcode { 2 } }
+    allow(Facter).to receive(:fact).with(:augeasprovider_grub_version).and_return(Facter.add(:augeasprovider_grub_version) { setcode { 2 } })
 
-    provider_class.stubs(:default?).returns(true)
-    FileTest.stubs(:exist?).returns false
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
+    allow_any_instance_of(provider_class).to receive(:default?).and_return(true)
+    allow(FileTest).to receive(:exist?).and_return(false)
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
     ['/usr/sbin/grub2-mkconfig', '/usr/sbin/grub-mkconfig'].each do |path|
-      FileTest.stubs(:file?).with(path).returns true
-      FileTest.stubs(:exist?).with(path).returns true
-      FileTest.stubs(:executable?).with(path).returns true
+      allow(FileTest).to receive(:file?).with(path).and_return(true)
+      allow(FileTest).to receive(:exist?).with(path).and_return(true)
+      allow(FileTest).to receive(:executable?).with(path).and_return(true)
     end
-    FileTest.stubs(:file?).with('/etc/grub2-efi.cfg').returns true
-    FileTest.stubs(:file?).with('/boot/grub2/grub.cfg').returns true
-    FileTest.stubs(:exist?).with('/etc/default/grub').returns true
+    allow(FileTest).to receive(:file?).with('/etc/grub2-efi.cfg').and_return(true)
+    allow(FileTest).to receive(:file?).with('/boot/grub2/grub.cfg').and_return(true)
+    allow(FileTest).to receive(:exist?).with('/etc/default/grub').and_return(true)
 
     require 'puppetx/augeasproviders_grub/util'
-    PuppetX::AugeasprovidersGrub::Util.stubs(:grub2_cfg_paths).returns(['/dev/null'])
+    allow(PuppetX::AugeasprovidersGrub::Util).to receive(:grub2_cfg_paths).and_return(['/dev/null'])
   end
 
   context 'with full file' do
@@ -52,7 +52,7 @@ describe provider_class do
     let(:target) { tmptarget.path }
 
     it 'lists instances' do
-      provider_class.stubs(:target).returns(target)
+      allow(provider_class).to receive(:target).and_return(target)
       inst = provider_class.instances.map do |p|
         {
           name: p.get(:name),
@@ -62,19 +62,19 @@ describe provider_class do
         }
       end
 
-      inst.size.should == 7
-      inst[0].should == { name: 'quiet', ensure: :present, value: :absent, bootmode: 'all' }
-      inst[1].should == { name: 'elevator', ensure: :present, value: 'noop', bootmode: 'all' }
-      inst[2].should == { name: 'divider', ensure: :present, value: '10', bootmode: 'all' }
-      inst[3].should == { name: 'rhgb', ensure: :present, value: :absent, bootmode: 'default' }
-      inst[4].should == { name: 'nohz', ensure: :present, value: 'on', bootmode: 'default' }
-      inst[5].should == { name: 'rhgb', ensure: :present, value: :absent, bootmode: 'normal' }
-      inst[6].should == { name: 'nohz', ensure: :present, value: 'on', bootmode: 'normal' }
+      expect(inst.size).to eq 7
+      expect(inst[0]).to include(name: 'quiet', ensure: :present, value: :absent, bootmode: 'all')
+      expect(inst[1]).to include(name: 'elevator', ensure: :present, value: 'noop', bootmode: 'all')
+      expect(inst[2]).to include(name: 'divider', ensure: :present, value: '10', bootmode: 'all')
+      expect(inst[3]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'default')
+      expect(inst[4]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'default')
+      expect(inst[5]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'normal')
+      expect(inst[6]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'normal')
     end
 
     describe 'when creating entries' do
       before do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
       end
 
       it 'creates no-value entries' do
@@ -212,13 +212,13 @@ describe provider_class do
                     provider: 'grub2'
                   ))
 
-      txn.any_failed?.should_not.nil?
-      @logs.first.level.should == :err
-      @logs.first.message.include?('Unsupported bootmode').should == true
+      expect(txn.any_failed?).not_to eq nil
+      expect(@logs.first.level).to eq :err
+      expect(@logs.first.message.include?('Unsupported bootmode')).to eq true
     end
 
     it 'deletes entries' do
-      provider_class.any_instance.expects(:mkconfig).returns('OK')
+      allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
 
       apply!(Puppet::Type.type(:kernel_parameter).new(
                name: 'divider',
@@ -243,11 +243,11 @@ describe provider_class do
 
     describe 'when modifying values' do
       before do
-        provider_class.any_instance.stubs(:create).never
+        allow_any_instance_of(provider_class).to receive(:create).and_raise('nope')
       end
 
       it 'changes existing values' do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
         apply!(Puppet::Type.type(:kernel_parameter).new(
                  name: 'elevator',
                  ensure: :present,
@@ -272,7 +272,7 @@ describe provider_class do
       end
 
       it 'adds value to entry' do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
         apply!(Puppet::Type.type(:kernel_parameter).new(
                  name: 'quiet',
                  ensure: :present,
@@ -298,7 +298,7 @@ describe provider_class do
 
       it 'adds and remove entries for multiple values' do
         # This will run once for each parameter resource
-        provider_class.any_instance.expects(:mkconfig).returns('OK').twice
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
 
         # Add multiple entries
         apply!(Puppet::Type.type(:kernel_parameter).new(
@@ -362,9 +362,9 @@ describe provider_class do
                     provider: 'grub2'
                   ))
 
-      txn.any_failed?.should_not.nil?
-      @logs.first.level.should == :err
-      @logs.first.message.include?(target).should == true
+      expect(txn.any_failed?).not_to eq nil
+      expect(@logs.first.level).to eq :err
+      expect(@logs.first.message.include?(target)).to eq true
     end
   end
 end

@@ -8,23 +8,23 @@ provider_class = Puppet::Type.type(:kernel_parameter).provider(:grub)
 describe provider_class do
   before do
     Facter.clear
-    Facter.stubs(:fact).with(:augeasprovider_grub_version).returns Facter.add(:augeasprovider_grub_version) { setcode { 1 } }
+    allow(Facter).to receive(:fact).with(:augeasprovider_grub_version).and_return(Facter.add(:augeasprovider_grub_version) { setcode { 1 } })
 
-    provider_class.stubs(:default?).returns(true)
-    FileTest.stubs(:exist?).returns false
-    FileTest.stubs(:executable?).returns false
-    FileTest.stubs(:exist?).with('/boot/grub/menu.lst').returns true
+    allow(provider_class).to receive(:default?).and_return(true)
+    allow(FileTest).to receive(:exist?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    allow(FileTest).to receive(:exist?).with('/boot/grub/menu.lst').and_return(true)
   end
 
   describe 'when finding GRUB config' do
     it 'finds EFI config when present' do
-      FileTest.stubs(:exist?).with('/boot/efi/EFI/redhat/grub.conf').returns true
-      provider_class.target.should == '/boot/efi/EFI/redhat/grub.conf'
+      allow(FileTest).to receive(:exist?).with('/boot/efi/EFI/redhat/grub.conf').and_return(true)
+      expect(provider_class.target).to eq '/boot/efi/EFI/redhat/grub.conf'
     end
 
     it 'defaults to BIOS config' do
-      FileTest.stubs(:exist?).with('/boot/efi/EFI/redhat/grub.conf').returns false
-      provider_class.target.should == '/boot/grub/menu.lst'
+      allow(FileTest).to receive(:exist?).with('/boot/efi/EFI/redhat/grub.conf').and_return(false)
+      expect(provider_class.target).to eq '/boot/grub/menu.lst'
     end
   end
 
@@ -33,7 +33,7 @@ describe provider_class do
     let(:target) { tmptarget.path }
 
     it 'lists instances' do
-      provider_class.stubs(:target).returns(target)
+      allow(provider_class).to receive(:target).and_return(target)
       inst = provider_class.instances.map do |p|
         {
           name: p.get(:name),
@@ -43,17 +43,17 @@ describe provider_class do
         }
       end
 
-      inst.size.should == 10
-      inst[0].should == { name: 'ro', ensure: :present, value: :absent, bootmode: :all }
-      inst[1].should == { name: 'root', ensure: :present, value: '/dev/VolGroup00/LogVol00', bootmode: :all }
-      inst[2].should == { name: 'rhgb', ensure: :present, value: :absent, bootmode: :default }
-      inst[3].should == { name: 'quiet', ensure: :present, value: :absent, bootmode: :default }
-      inst[4].should == { name: 'elevator', ensure: :present, value: 'noop', bootmode: :all }
-      inst[5].should == { name: 'divider', ensure: :present, value: '10', bootmode: :all }
-      inst[6].should == { name: 'rd_LVM_LV', ensure: :present, value: ['vg/lv1', 'vg/lv2'], bootmode: :default }
-      inst[7].should == { name: 'S', ensure: :present, value: :absent, bootmode: :recovery }
-      inst[8].should == { name: 'splash', ensure: :present, value: :absent, bootmode: :normal }
-      inst[9].should == { name: 'nohz', ensure: :present, value: 'on', bootmode: :normal }
+      expect(inst.size).to eq 10
+      expect(inst[0]).to include(name: 'ro', ensure: :present, value: :absent, bootmode: :all)
+      expect(inst[1]).to include(name: 'root', ensure: :present, value: '/dev/VolGroup00/LogVol00', bootmode: :all)
+      expect(inst[2]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: :default)
+      expect(inst[3]).to include(name: 'quiet', ensure: :present, value: :absent, bootmode: :default)
+      expect(inst[4]).to include(name: 'elevator', ensure: :present, value: 'noop', bootmode: :all)
+      expect(inst[5]).to include(name: 'divider', ensure: :present, value: '10', bootmode: :all)
+      expect(inst[6]).to include(name: 'rd_LVM_LV', ensure: :present, value: ['vg/lv1', 'vg/lv2'], bootmode: :default)
+      expect(inst[7]).to include(name: 'S', ensure: :present, value: :absent, bootmode: :recovery)
+      expect(inst[8]).to include(name: 'splash', ensure: :present, value: :absent, bootmode: :normal)
+      expect(inst[9]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: :normal)
     end
 
     describe 'when creating entries' do
@@ -66,8 +66,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 3
-          aug.match('title/kernel/foo').map { |p| aug.get(p) }.should == [nil] * 3
+          expect(aug.match('title/kernel/foo').size).to eq 3
+          expect(aug.match('title/kernel/foo').map { |p| aug.get(p) }).to eq [nil] * 3
         end
       end
 
@@ -81,8 +81,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 3
-          aug.match('title/kernel/foo').map { |p| aug.get(p) }.should == ['bar'] * 3
+          expect(aug.match('title/kernel/foo').size).to eq 3
+          expect(aug.match('title/kernel/foo').map { |p| aug.get(p) }).to eq ['bar'] * 3
         end
       end
 
@@ -96,8 +96,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 6
-          aug.match('title/kernel/foo').map { |p| aug.get(p) }.should == %w[bar baz] * 3
+          expect(aug.match('title/kernel/foo').size).to eq 6
+          expect(aug.match('title/kernel/foo').map { |p| aug.get(p) }).to eq %w[bar baz] * 3
         end
       end
 
@@ -113,10 +113,10 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/rd_LVM_LV').size.should == 9
-          aug.match("title/kernel/rd_LVM_LV[.='vg/lv1']").size.should == 0
-          aug.match("title/kernel/rd_LVM_LV[.='vg/lv2']").size.should == 0
-          aug.match('title/kernel/rd_LVM_LV').map { |p| aug.get(p) }.should == ['vg/lv7', 'vg/lv8', 'vg/lv9'] * 3
+          expect(aug.match('title/kernel/rd_LVM_LV').size).to eq 9
+          expect(aug.match("title/kernel/rd_LVM_LV[.='vg/lv1']").size).to eq 0
+          expect(aug.match("title/kernel/rd_LVM_LV[.='vg/lv2']").size).to eq 0
+          expect(aug.match('title/kernel/rd_LVM_LV').map { |p| aug.get(p) }).to eq ['vg/lv7', 'vg/lv8', 'vg/lv9'] * 3
         end
       end
 
@@ -130,10 +130,10 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/rd_LVM_LV').size.should == 3
-          aug.match("title/kernel/rd_LVM_LV[.='vg/lv1']").size.should == 0
-          aug.match("title/kernel/rd_LVM_LV[.='vg/lv2']").size.should == 0
-          aug.match('title/kernel/rd_LVM_LV').map { |p| aug.get(p) }.should == ['vg/lv7'] * 3
+          expect(aug.match('title/kernel/rd_LVM_LV').size).to eq 3
+          expect(aug.match("title/kernel/rd_LVM_LV[.='vg/lv1']").size).to eq 0
+          expect(aug.match("title/kernel/rd_LVM_LV[.='vg/lv2']").size).to eq 0
+          expect(aug.match('title/kernel/rd_LVM_LV').map { |p| aug.get(p) }).to eq ['vg/lv7'] * 3
         end
       end
 
@@ -147,8 +147,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 1
-          aug.match('title[int(../default)+1]/kernel/foo').size.should == 1
+          expect(aug.match('title/kernel/foo').size).to eq 1
+          expect(aug.match('title[int(../default)+1]/kernel/foo').size).to eq 1
         end
       end
 
@@ -162,8 +162,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 1
-          aug.match('title[2]/kernel/foo').size.should == 1
+          expect(aug.match('title/kernel/foo').size).to eq 1
+          expect(aug.match('title[2]/kernel/foo').size).to eq 1
         end
       end
 
@@ -177,9 +177,9 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/foo').size.should == 2
-          aug.match('title[1]/kernel/foo').size.should == 1
-          aug.match('title[3]/kernel/foo').size.should == 1
+          expect(aug.match('title/kernel/foo').size).to eq 2
+          expect(aug.match('title[1]/kernel/foo').size).to eq 1
+          expect(aug.match('title[3]/kernel/foo').size).to eq 1
         end
       end
     end
@@ -194,7 +194,7 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/divider').should == []
+          expect(aug.match('title/kernel/divider')).to eq []
         end
       end
 
@@ -208,14 +208,14 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/rd_LVM_LV').size.should == 0
+          expect(aug.match('title/kernel/rd_LVM_LV').size).to eq 0
         end
       end
     end
 
     describe 'when modifying values' do
       before do
-        provider_class.any_instance.stubs(:create).never
+        allow_any_instance_of(provider_class).to receive(:create).and_raise('nope')
       end
 
       it 'changes existing values' do
@@ -228,8 +228,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/elevator').size.should == 3
-          aug.match('title/kernel/elevator').map { |p| aug.get(p) }.should == ['deadline'] * 3
+          expect(aug.match('title/kernel/elevator').size).to eq 3
+          expect(aug.match('title/kernel/elevator').map { |p| aug.get(p) }).to eq ['deadline'] * 3
         end
       end
 
@@ -243,8 +243,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/ro').size.should == 3
-          aug.match('title/kernel/ro').map { |p| aug.get(p) }.should == ['foo'] * 3
+          expect(aug.match('title/kernel/ro').size).to eq 3
+          expect(aug.match('title/kernel/ro').map { |p| aug.get(p) }).to eq ['foo'] * 3
         end
       end
 
@@ -258,8 +258,8 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/elevator').size.should == 6
-          aug.match('title/kernel/elevator').map { |p| aug.get(p) }.should == %w[noop deadline] * 3
+          expect(aug.match('title/kernel/elevator').size).to eq 6
+          expect(aug.match('title/kernel/elevator').map { |p| aug.get(p) }).to eq %w[noop deadline] * 3
         end
       end
 
@@ -273,9 +273,9 @@ describe provider_class do
                ))
 
         aug_open(target, 'Grub.lns') do |aug|
-          aug.match('title/kernel/root').size.should == 6
-          aug.match("title/kernel/root[.='/dev/VolGroup00/LogVol00']").size.should == 0
-          aug.match('title/kernel/root').map { |p| aug.get(p) }.should == %w[test1 test2] * 3
+          expect(aug.match('title/kernel/root').size).to eq 6
+          expect(aug.match("title/kernel/root[.='/dev/VolGroup00/LogVol00']").size).to eq 0
+          expect(aug.match('title/kernel/root').map { |p| aug.get(p) }).to eq %w[test1 test2] * 3
         end
       end
     end
@@ -293,9 +293,9 @@ describe provider_class do
                     provider: 'grub'
                   ))
 
-      txn.any_failed?.should_not.nil?
-      @logs.first.level.should == :err
-      @logs.first.message.include?(target).should == true
+      expect(txn.any_failed?).not_to eq nil
+      expect(@logs.first.level).to eq :err
+      expect(@logs.first.message.include?(target)).to eq true
     end
   end
 end
