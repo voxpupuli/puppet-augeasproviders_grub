@@ -32,21 +32,21 @@
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         "7",
-        "8.1"
+        "8"
       ]
     },
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
         "7",
-        "8.1"
+        "8"
       ]
     },
     {
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
         "7",
-        "8.1"
+        "8"
       ]
     }
   ],
