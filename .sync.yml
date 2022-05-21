@@ -5,6 +5,10 @@ Gemfile:
   optional:
     ':test':
       - gem: ruby-augeas
+    ':system_tests':
+      - gem: 'simp-beaker-helpers'
+        version: '~> 1.24'
+      - gem: 'puppetlabs_spec_helper'
 spec/spec_helper.rb:
   spec_overrides:
     - "require 'augeas_spec'"

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+# Default to beaker_docker
+ENV['BEAKER_HYPERVISOR'] ||= 'docker'
+
 require 'beaker-rspec'
-require 'tmpdir'
-require 'yaml'
 
 # Force FIPS off for these tests since it is not relevant.
 ENV['BEAKER_fips'] = 'no'
@@ -10,16 +11,7 @@ ENV['BEAKER_fips'] = 'no'
 require 'simp/beaker_helpers'
 include Simp::BeakerHelpers
 
-unless ENV['BEAKER_provision'] == 'no'
-  hosts.each do |host|
-    # Install Puppet
-    if host.is_pe?
-      install_pe
-    else
-      install_puppet
-    end
-  end
-end
+install_puppet unless ENV['BEAKER_provision'] == 'no'
 
 RSpec.configure do |c|
   c.include Helpers
