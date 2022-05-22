@@ -5,69 +5,8 @@ require 'spec_helper_acceptance'
 test_name 'Augeasproviders Grub'
 
 describe 'Global Config Tests' do
-  hosts_with_role(hosts, 'grub').each do |host|
-    context 'set timeout in grub' do
-      let(:manifest) do
-        %(
-        grub_config { 'timeout':
-          value => 1
-        }
-      )
-      end
-
-      # Using puppet_apply as a helper
-      it 'works with no errors' do
-        apply_manifest_on(host, manifest, catch_failures: true)
-      end
-
-      it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
-      end
-
-      it 'has a timeout of 1' do
-        on(host, %(grep "timeout=1" /etc/grub.conf))
-      end
-    end
-
-    context 'set invalid variable in grub' do
-      let(:manifest) do
-        %(
-        grub_config { 'foobar': }
-      )
-      end
-
-      # Using puppet_apply as a helper
-      it 'fails to apply' do
-        result = apply_manifest_on(host, manifest, expect_failures: true)
-        expect(result.output).to match(%r{Grub_config\[foobar\].*Failed to save Augeas tree})
-      end
-    end
-
-    context 'set fallback in grub' do
-      let(:manifest) do
-        %(
-        grub_config { 'fallback':
-          value => 0
-        }
-      )
-      end
-
-      it 'works with no errors' do
-        apply_manifest_on(host, manifest, catch_failures: true)
-      end
-
-      it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
-      end
-
-      it 'has a fallback of 0' do
-        on(host, %(grep "fallback 0" /etc/grub.conf))
-      end
-    end
-  end
-
-  hosts_with_role(hosts, 'grub2').each do |host|
-    context 'set timeout in grub2' do
+  hosts.each do |host|
+    context 'set timeout' do
       let(:manifest) do
         %(
         grub_config { 'GRUB_TIMEOUT':
@@ -91,7 +30,7 @@ describe 'Global Config Tests' do
       end
     end
 
-    context 'set arbitrary value in grub2' do
+    context 'set arbitrary value' do
       let(:manifest) do
         %(
         grub_config { 'GRUB_FOOBAR':
@@ -114,7 +53,7 @@ describe 'Global Config Tests' do
       end
     end
 
-    context 'remove value in grub2' do
+    context 'remove value' do
       let(:manifest) do
         %(
         grub_config { 'GRUB_FOOBAR':
@@ -137,7 +76,7 @@ describe 'Global Config Tests' do
       end
     end
 
-    context 'set Boolean value in grub2' do
+    context 'set Boolean value' do
       let(:manifest) do
         %(
         grub_config { 'GRUB_BOOLEAN_TEST':
@@ -160,7 +99,7 @@ describe 'Global Config Tests' do
       end
     end
 
-    context 'set a value with spaces in grub2' do
+    context 'set a value with spaces' do
       let(:manifest) do
         %(
         grub_config { 'GRUB_SPACES_TEST':

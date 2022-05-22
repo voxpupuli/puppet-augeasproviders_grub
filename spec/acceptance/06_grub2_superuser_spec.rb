@@ -5,7 +5,7 @@ require 'spec_helper_acceptance'
 test_name 'Augeasproviders Grub'
 
 describe 'GRUB2 User Tests' do
-  hosts_with_role(hosts, 'grub2').each do |host|
+  hosts.each do |host|
     context 'set a root superuser password' do
       let(:manifest) do
         %(

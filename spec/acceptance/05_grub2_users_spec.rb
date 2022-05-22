@@ -5,7 +5,7 @@ require 'spec_helper_acceptance'
 test_name 'Augeasproviders Grub'
 
 describe 'GRUB2 User Tests' do
-  hosts_with_role(hosts, 'grub2').each do |host|
+  hosts.each do |host|
     let(:target_files) do
       [
         '/etc/grub.d/02_puppet_managed_users',
