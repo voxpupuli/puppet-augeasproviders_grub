@@ -21,7 +21,7 @@ describe 'GRUB2 User Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
     end
 
@@ -45,7 +45,7 @@ describe 'GRUB2 User Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
     end
   end

@@ -47,7 +47,7 @@ describe 'GRUB2 User Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'sets an encrypted password' do
@@ -106,7 +106,7 @@ describe 'GRUB2 User Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'sets an encrypted password' do
@@ -136,7 +136,7 @@ describe 'GRUB2 User Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'purges unmanaged users' do

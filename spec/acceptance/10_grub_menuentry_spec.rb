@@ -25,7 +25,7 @@ describe 'GRUB Menuentry Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'has set the default to the new entry' do

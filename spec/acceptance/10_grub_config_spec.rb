@@ -21,7 +21,7 @@ describe 'Global Config Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'has a timeout of 1' do
@@ -45,7 +45,7 @@ describe 'Global Config Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'has a GRUB_FOOBAR of BAZ' do
@@ -68,7 +68,7 @@ describe 'Global Config Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'does not have a GRUB_FOOBAR' do
@@ -91,7 +91,7 @@ describe 'Global Config Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'has a GRUB_BOOLEAN_TEST that is true' do
@@ -114,7 +114,7 @@ describe 'Global Config Tests' do
       end
 
       it 'is idempotent' do
-        apply_manifest_on(host, manifest, { catch_changes: true })
+        apply_manifest_on(host, manifest, catch_changes: true)
       end
 
       it 'has a valid GRUB_SPACES_TEST entry' do
