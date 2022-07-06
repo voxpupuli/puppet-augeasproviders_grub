@@ -1,10 +1,13 @@
+# frozen_string_literal: true
+
 # GRUB 2 support for kernel parameters, edits /etc/default/grub
 #
 # Copyright (c) 2012 Dominic Cleal
 # Licensed under the Apache License, Version 2.0
 
-raise("Missing augeasproviders_core module dependency") if Puppet::Type.type(:augeasprovider).nil?
-Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
+raise('Missing augeasproviders_core module dependency') if Puppet::Type.type(:augeasprovider).nil?
+
+Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Uses Augeas API to update kernel parameters in GRUB2's /etc/default/grub"
 
   default_file { '/etc/default/grub' }
@@ -16,16 +19,16 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
   end
 
   def self.mkconfig_path
-    which("grub2-mkconfig") or which("grub-mkconfig") or '/usr/sbin/grub-mkconfig'
+    which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  defaultfor :osfamily => 'Redhat', :operatingsystemmajrelease => [ '7' ]
-  defaultfor :operatingsystem => 'Debian', :operatingsystemmajrelease => [ '8' ]
-  defaultfor :operatingsystem => 'Ubuntu', :operatingsystemmajrelease => [ '14.04' ]
+  defaultfor osfamily: 'Redhat', operatingsystemmajrelease: ['7']
+  defaultfor operatingsystem: 'Debian', operatingsystemmajrelease: ['8']
+  defaultfor operatingsystem: 'Ubuntu', operatingsystemmajrelease: ['14.04']
 
-  confine :feature => :augeas
-  defaultfor :augeasprovider_grub_version => 2
-  commands :mkconfig => mkconfig_path
+  confine feature: :augeas
+  defaultfor augeasprovider_grub_version: 2
+  commands mkconfig: mkconfig_path
 
   # when both grub* providers match, prefer GRUB 2
   def self.specificity
@@ -37,24 +40,24 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       resources = []
 
       # Params are nicely separated, but no recovery-only setting (hard-coded)
-      sections = { 'all'    => "GRUB_CMDLINE_LINUX",
-                   'normal' => "GRUB_CMDLINE_LINUX_DEFAULT",
-                   'default' => "GRUB_CMDLINE_LINUX_DEFAULT" }
+      sections = { 'all' => 'GRUB_CMDLINE_LINUX',
+                   'normal' => 'GRUB_CMDLINE_LINUX_DEFAULT',
+                   'default' => 'GRUB_CMDLINE_LINUX_DEFAULT' }
       sections.keys.sort.each do |bootmode|
         key = sections[bootmode]
         # Get all unique param names
-        params = aug.match("$target/#{key}/value").map { |pp|
-          aug.get(pp).split("=")[0]
-        }.uniq
+        params = aug.match("$target/#{key}/value").map do |pp|
+          aug.get(pp).split('=')[0]
+        end.uniq
 
         # Find all values for each param name
         params.each do |param|
-          vals = aug.match("$target/#{key}/value[.=~regexp('^#{param}(=.*)?$')]").map {|vp|
-            aug.get(vp).split("=", 2)[1]
-          }
+          vals = aug.match("$target/#{key}/value[.=~regexp('^#{param}(=.*)?$')]").map do |vp|
+            aug.get(vp).split('=', 2)[1]
+          end
           vals = vals[0] if vals.size == 1
 
-          param = {:ensure => :present, :name => param, :value => vals, :bootmode => bootmode}
+          param = { ensure: :present, name: param, value: vals, bootmode: bootmode }
           resources << new(param)
         end
       end
@@ -64,24 +67,24 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
   def self.section(resource)
     case resource[:bootmode].to_s
-    when "default", "normal"
-      "GRUB_CMDLINE_LINUX_DEFAULT"
-    when "all"
-      "GRUB_CMDLINE_LINUX"
+    when 'default', 'normal'
+      'GRUB_CMDLINE_LINUX_DEFAULT'
+    when 'all'
+      'GRUB_CMDLINE_LINUX'
     else
-      fail("Unsupported bootmode for #{self.class.to_s} provider")
+      raise("Unsupported bootmode for #{self.class} provider")
     end
   end
 
   def create
-    self.value=(resource[:value])
+    self.value = (resource[:value])
   end
 
   def value
     augopen do |aug|
-      aug.match('$resource').map {|vp|
-        aug.get(vp).split("=", 2)[1]
-      }
+      aug.match('$resource').map do |vp|
+        aug.get(vp).split('=', 2)[1]
+      end
     end
   end
 
@@ -93,17 +96,17 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
     src_path = '$target/GRUB_CMDLINE_LINUX/value'
     dest_path = '$target/GRUB_CMDLINE_LINUX_DEFAULT'
 
-    if aug.match("#{dest_path}/value").empty?
-      aug.match(src_path).each do |val|
-        src_val = aug.get(val)
+    return unless aug.match("#{dest_path}/value").empty?
 
-       # Need to let the rest of the code work on the actual value properly.
-       unless src_val.split('=').first.strip == resource[:name]
-          val_target = val.split('/').last
+    aug.match(src_path).each do |val|
+      src_val = aug.get(val)
 
-          aug.set("#{dest_path}/#{val_target}", src_val)
-        end
-      end
+      # Need to let the rest of the code work on the actual value properly.
+      next if src_val.split('=').first.strip == resource[:name]
+
+      val_target = val.split('/').last
+
+      aug.set("#{dest_path}/#{val_target}", src_val)
     end
   end
 
@@ -114,13 +117,9 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       current_section = self.class.section(resource)
       has_section = aug.match("$target/#{current_section}")
 
-      if !has_section || has_section.empty?
-        aug.set("$target/#{current_section}/quote",'"')
-      end
+      aug.set("$target/#{current_section}/quote", '"') if !has_section || has_section.empty?
 
-      if current_section == 'GRUB_CMDLINE_LINUX_DEFAULT'
-       munge_grub_cmdline_linux_default(aug)
-      end
+      munge_grub_cmdline_linux_default(aug) if current_section == 'GRUB_CMDLINE_LINUX_DEFAULT'
 
       if newval && !newval.empty?
         vals = newval.clone

@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 # GRUB 2 support for kernel parameters, edits /etc/default/grub
 #
 # Copyright (c) 2016 Trevor Vaughan <tvaughan@onyxpoint.com>
 # Licensed under the Apache License, Version 2.0
 # Based on work by Dominic Cleal
 
-raise("Missing augeasproviders_core module dependency") if Puppet::Type.type(:augeasprovider).nil?
-Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:augeasprovider).provider(:default)) do
+raise('Missing augeasproviders_core module dependency') if Puppet::Type.type(:augeasprovider).nil?
+
+Puppet::Type.type(:grub_config).provide(:grub2, parent: Puppet::Type.type(:augeasprovider).provider(:default)) do
   desc "Uses Augeas API to update kernel parameters in GRUB2's /etc/default/grub"
 
   default_file { '/etc/default/grub' }
@@ -13,13 +16,13 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
   lens { 'Shellvars.lns' }
 
   def self.mkconfig_path
-    which("grub2-mkconfig") or which("grub-mkconfig") or '/usr/sbin/grub-mkconfig'
+    which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  confine :feature => :augeas
-  commands :mkconfig => mkconfig_path
+  confine feature: :augeas
+  commands mkconfig: mkconfig_path
 
-  defaultfor :osfamily => :RedHat
+  defaultfor osfamily: :RedHat
 
   def self.instances
     augopen do |aug|
@@ -29,7 +32,7 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
         param = key.split('/').last.strip
         val = aug.get(key)
 
-        resource = {:ensure => :present, :name => param}
+        resource = { ensure: :present, name: param }
 
         if val
           val.strip!
@@ -50,7 +53,7 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
   end
 
   def create
-    self.value=(resource[:value])
+    self.value = (resource[:value])
   end
 
   def destroy
@@ -66,11 +69,7 @@ Puppet::Type.type(:grub_config).provide(:grub2, :parent => Puppet::Type.type(:au
   end
 
   def value=(newval)
-    if newval.is_a?(String)
-      unless %w[' "].include?(newval[0].chr)
-        newval = %Q("#{newval}")
-      end
-    end
+    newval = %("#{newval}") if newval.is_a?(String) && !%w[' "].include?(newval[0].chr)
 
     augopen! do |aug|
       aug.set("$target/#{resource[:name]}", newval)

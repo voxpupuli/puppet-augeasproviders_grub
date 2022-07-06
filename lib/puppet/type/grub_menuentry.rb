@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Manages GRUB kernel menu items
 #
 # Focuses on linux-compatible menu items.
@@ -18,8 +20,8 @@ Puppet::Type.newtype(:grub_menuentry) do
           either GRUB or GRUB2!
   EOM
 
-  feature :grub, "Can handle Legacy GRUB settings"
-  feature :grub2, "Can handle GRUB2 settings"
+  feature :grub, 'Can handle Legacy GRUB settings'
+  feature :grub2, 'Can handle GRUB2 settings'
 
   ensurable do
     defaultvalues
@@ -34,14 +36,14 @@ Puppet::Type.newtype(:grub_menuentry) do
     isnamevar
   end
 
-  newparam(:target, :required_features => %w(grub)) do
+  newparam(:target, required_features: %w[grub]) do
     desc <<-EOM
       The bootloader configuration file, if in a non-default location for the
       provider.
     EOM
   end
 
-  newparam(:add_defaults_on_creation, :parent => Puppet::Parameter::Boolean) do
+  newparam(:add_defaults_on_creation, parent: Puppet::Parameter::Boolean) do
     desc <<-EOM
       If set, when using the ':preserve:' option in `kernel_options` or
       `modules` will add the system defaults if the entry is being first
@@ -60,7 +62,7 @@ Puppet::Type.newtype(:grub_menuentry) do
       The filesystem root.
     EOM
 
-    newvalues(/\(.*\)/)
+    newvalues(%r{\(.*\)})
   end
 
   newproperty(:default_entry) do
@@ -81,7 +83,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     def should
       return nil unless defined?(@should)
 
-      (@should - [true,:true]).empty?
+      (@should - [true, :true]).empty?
     end
 
     def insync?(is)
@@ -100,14 +102,14 @@ Puppet::Type.newtype(:grub_menuentry) do
       this is an error.
     EOM
 
-    newvalues(/^(\/.*|:(default|preserve):)/)
+    newvalues(%r{^(/.*|:(default|preserve):)})
 
     def insync?(is)
-      provider.kernel?(is,should)
+      provider.kernel?(is, should)
     end
   end
 
-  newproperty(:kernel_options, :array_matching => :all) do
+  newproperty(:kernel_options, array_matching: :all) do
     desc <<-EOM
       An array of kernel options to apply to the :kernel property.
 
@@ -132,17 +134,15 @@ Puppet::Type.newtype(:grub_menuentry) do
     defaultto(':preserve:')
 
     validate do |value|
-      if value.include?(':defaults:') && value.include?(':preserve:')
-        raise Puppet::ParseError, "Only one of :defaults: or :preserve: may be specified"
-      end
+      raise Puppet::ParseError, 'Only one of :defaults: or :preserve: may be specified' if value.include?(':defaults:') && value.include?(':preserve:')
     end
 
     def insync?(is)
-      provider.kernel_options?(is,should)
+      provider.kernel_options?(is, should)
     end
   end
 
-  newproperty(:modules, :array_matching => :all) do
+  newproperty(:modules, array_matching: :all) do
     desc <<-EOM
       An Array of module entry Arrays that apply to the given entry.
       Since each Multiboot format boot image is unique, you must know what you
@@ -178,27 +178,23 @@ Puppet::Type.newtype(:grub_menuentry) do
     EOM
 
     validate do |value|
-      unless value.is_a?(Array) && (value.first.is_a?(Array) || value.first.is_a?(String))
-        raise Puppet::ParseError, ':modules requires an Array of Arrays'
-      end
+      raise Puppet::ParseError, ':modules requires an Array of Arrays' unless value.is_a?(Array) && (value.first.is_a?(Array) || value.first.is_a?(String))
 
       value.each do |val_line|
-        if val_line.include?(':defaults:') && val_line.include?(':preserve:')
-          raise Puppet::ParseError, "Only one of :defaults: or :preserve: may be specified"
-        end
+        raise Puppet::ParseError, 'Only one of :defaults: or :preserve: may be specified' if val_line.include?(':defaults:') && val_line.include?(':preserve:')
       end
     end
 
     def insync?(is)
-      provider.modules?(is,should)
+      provider.modules?(is, should)
     end
 
     def is_to_s(value)
-      return '"' + Array(Array(value).map{|x| x.join(' ')}).join("\n") + '"'
+      "\"#{Array(Array(value).map { |x| x.join(' ') }).join("\n")}\""
     end
 
     def should_to_s(value)
-      return '"' + Array(Array(value).map{|x| x.join(' ')}).join("\n") + '"'
+      "\"#{Array(Array(value).map { |x| x.join(' ') }).join("\n")}\""
     end
   end
 
@@ -213,14 +209,14 @@ Puppet::Type.newtype(:grub_menuentry) do
       this is an error.
     EOM
 
-    newvalues(/^(\/.*|:(default|preserve):)/)
+    newvalues(%r{^(/.*|:(default|preserve):)})
 
     def insync?(is)
-      provider.initrd?(is,should)
+      provider.initrd?(is, should)
     end
   end
 
-  newproperty(:makeactive, :required_features => %w(grub)) do
+  newproperty(:makeactive, required_features: %w[grub]) do
     desc <<-EOM
       In Legacy GRUB, having this set will add a 'makeactive' entry to the menuentry.
     EOM
@@ -231,7 +227,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     def should
       return nil unless defined?(@should)
 
-      (@should - [true,:true]).empty?
+      (@should - [true, :true]).empty?
     end
 
     def insync?(is)
@@ -240,7 +236,7 @@ Puppet::Type.newtype(:grub_menuentry) do
   end
 
   # GRUB2 only properties
-  newproperty(:bls, :required_features => %w(grub2)) do
+  newproperty(:bls, required_features: %w[grub2]) do
     desc <<-EOM
       Explicitly enable, or disable, BLS support for this resource.
 
@@ -252,7 +248,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     def should
       return nil unless defined?(@should)
 
-      (@should - [true,:true]).empty?
+      (@should - [true, :true]).empty?
     end
 
     def insync?(is)
@@ -260,13 +256,13 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:classes, :array_matching => :all, :required_features => %w(grub2)) do
+  newproperty(:classes, array_matching: :all, required_features: %w[grub2]) do
     desc <<-EOM
       Add this Array of classes to the menuentry.
     EOM
   end
 
-  newproperty(:users, :array_matching => :all, :required_features => %w(grub2)) do
+  newproperty(:users, array_matching: :all, required_features: %w[grub2]) do
     desc <<-EOM
       In GRUB2, having this set will add a requirement for the listed users to
       authenticate to the system in order to utilize the menu entry.
@@ -275,7 +271,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     defaultto [:unrestricted]
 
     munge do |value|
-      value = value.to_s.strip.split(/\s|,|;|\||&/)
+      value.to_s.strip.split(%r{\s|,|;|\||&})
     end
 
     def should
@@ -288,7 +284,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:load_16bit, :required_featurees => %w(grub2)) do
+  newproperty(:load_16bit, required_featurees: %w[grub2]) do
     desc <<-EOM
       If set, ensure that `linux16` and `initrd16` are used for the kernel entries.
 
@@ -300,7 +296,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     def should
       return nil unless defined?(@should)
 
-      (@should - [true,:true]).empty?
+      (@should - [true, :true]).empty?
     end
 
     def insync?(is)
@@ -308,7 +304,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:load_video, :required_features => %w(grub2)) do
+  newproperty(:load_video, required_features: %w[grub2]) do
     desc <<-EOM
       If true, add the `load_video` command to the menuentry.
 
@@ -319,7 +315,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     def should
       return nil unless defined?(@should)
 
-      (@should - [true,:true]).empty?
+      (@should - [true, :true]).empty?
     end
 
     def insync?(is)
@@ -327,7 +323,7 @@ Puppet::Type.newtype(:grub_menuentry) do
     end
   end
 
-  newproperty(:plugins, :array_matching => :all, :required_features => %w(grub2)) do
+  newproperty(:plugins, array_matching: :all, required_features: %w[grub2]) do
     desc <<-EOM
       An Array of plugins that should be included in this menuentry.
 
@@ -339,17 +335,15 @@ Puppet::Type.newtype(:grub_menuentry) do
   autorequire(:file) do
     reqs = []
 
-    if self[:target]
-      reqs << self[:target]
-    end
+    reqs << self[:target] if self[:target]
 
     reqs
   end
 
   autorequire(:kernel_parameter) do
-    kernel_parameters = catalog.resources.find_all { |r|
+    kernel_parameters = catalog.resources.select do |r|
       r.is_a?(Puppet::Type.type(:kernel_parameter)) && (r[:target] == self[:target])
-    }
+    end
 
     kernel_parameters
   end

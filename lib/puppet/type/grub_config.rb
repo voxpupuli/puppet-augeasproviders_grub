@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Manages GRUB global parameters (non-boot entry)
 #
 # Author Trevor Vaughan <tvaughan@onyxpoint.com>
@@ -6,7 +8,7 @@
 # Based on work by Dominic Cleal
 
 Puppet::Type.newtype(:grub_config) do
-  @doc = "Manages global GRUB configuration parameters"
+  @doc = 'Manages global GRUB configuration parameters'
 
   ensurable do
     defaultvalues
@@ -52,7 +54,7 @@ Puppet::Type.newtype(:grub_config) do
 
     def insync?(is)
       if is.is_a?(String) && should.is_a?(String)
-        is.gsub(/\A("|')|("|')\Z/,'') == should.gsub(/\A("|')|("|')\Z/,'')
+        is.gsub(%r{\A("|')|("|')\Z}, '') == should.gsub(%r{\A("|')|("|')\Z}, '')
       else
         is == should
       end
@@ -62,9 +64,7 @@ Puppet::Type.newtype(:grub_config) do
   autorequire(:file) do
     reqs = []
 
-    if self[:target]
-      reqs << self[:target]
-    end
+    reqs << self[:target] if self[:target]
 
     reqs
   end
@@ -72,9 +72,9 @@ Puppet::Type.newtype(:grub_config) do
   autorequire(:kernel_parameter) do
     reqs = []
 
-    kernel_parameters = catalog.resources.find_all { |r|
+    kernel_parameters = catalog.resources.select do |r|
       r.is_a?(Puppet::Type.type(:kernel_parameter)) && (r[:target] == self[:target])
-    }
+    end
 
     # Handles conflicts with Grub >= 2 since this and kernel_parameter would edit
     # the same file.
@@ -82,13 +82,9 @@ Puppet::Type.newtype(:grub_config) do
     # Ignored for Grub < 2
     kernel_parameters.each do |kparam|
       if kparam[:bootmode].to_s == 'all'
-        if self[:name].to_s == 'GRUB_CMDLINE_LINUX'
-          raise Puppet::ParseError, "Conflicting resource #{kparam.to_s} defined"
-        end
-      elsif ['default','normal'].include?(kparam[:bootmode].to_s)
-        if self[:name].to_s == 'GRUB_CMDLINE_LINUX_DEFAULT'
-          raise Puppet::ParseError, "Conflicting resource #{kparam.to_s} defined"
-        end
+        raise Puppet::ParseError, "Conflicting resource #{kparam} defined" if self[:name].to_s == 'GRUB_CMDLINE_LINUX'
+      elsif %w[default normal].include?(kparam[:bootmode].to_s)
+        raise Puppet::ParseError, "Conflicting resource #{kparam} defined" if self[:name].to_s == 'GRUB_CMDLINE_LINUX_DEFAULT'
       end
 
       reqs << kparam

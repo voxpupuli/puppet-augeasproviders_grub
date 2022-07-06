@@ -1,88 +1,89 @@
 #!/usr/bin/env rspec
+# frozen_string_literal: true
 
 require 'spec_helper'
 provider_class = Puppet::Type.type(:kernel_parameter).provider(:grub2)
 
-LENS = "Shellvars_list.lns"
+LENS = 'Shellvars_list.lns'
 FILTER = "*[label() =~ regexp('GRUB_CMDLINE_LINUX.*')]"
 
 describe provider_class do
-  it "should find grub2-mkconfig" do
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
-    FileTest.stubs(:file?).with('/usr/sbin/grub2-mkconfig').returns true
-    FileTest.stubs(:executable?).with('/usr/sbin/grub2-mkconfig').returns true
-    provider_class.mkconfig_path.should == '/usr/sbin/grub2-mkconfig'
+  it 'finds grub2-mkconfig' do
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    allow(FileTest).to receive(:file?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+    allow(FileTest).to receive(:executable?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+    expect(provider_class.mkconfig_path).to eq '/usr/sbin/grub2-mkconfig'
   end
 
-  it "should find grub-mkconfig" do
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
-    FileTest.stubs(:file?).with('/usr/sbin/grub-mkconfig').returns true
-    FileTest.stubs(:executable?).with('/usr/sbin/grub-mkconfig').returns true
-    provider_class.mkconfig_path.should == '/usr/sbin/grub-mkconfig'
+  it 'finds grub-mkconfig' do
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    allow(FileTest).to receive(:file?).with('/usr/sbin/grub-mkconfig').and_return(true)
+    allow(FileTest).to receive(:executable?).with('/usr/sbin/grub-mkconfig').and_return(true)
+    expect(provider_class.mkconfig_path).to eq '/usr/sbin/grub-mkconfig'
   end
 end
 
 describe provider_class do
-  before :each do
+  before do
     Facter.clear
-    Facter.stubs(:fact).with(:augeasprovider_grub_version).returns Facter.add(:augeasprovider_grub_version) { setcode { 2 } }
+    allow(Facter).to receive(:fact).with(:augeasprovider_grub_version).and_return(Facter.add(:augeasprovider_grub_version) { setcode { 2 } })
 
-    provider_class.stubs(:default?).returns(true)
-    FileTest.stubs(:exist?).returns false
-    FileTest.stubs(:file?).returns false
-    FileTest.stubs(:executable?).returns false
-    [ '/usr/sbin/grub2-mkconfig', '/usr/sbin/grub-mkconfig' ].each do |path|
-      FileTest.stubs(:file?).with(path).returns true
-      FileTest.stubs(:exist?).with(path).returns true
-      FileTest.stubs(:executable?).with(path).returns true
+    allow_any_instance_of(provider_class).to receive(:default?).and_return(true)
+    allow(FileTest).to receive(:exist?).and_return(false)
+    allow(FileTest).to receive(:file?).and_return(false)
+    allow(FileTest).to receive(:executable?).and_return(false)
+    ['/usr/sbin/grub2-mkconfig', '/usr/sbin/grub-mkconfig'].each do |path|
+      allow(FileTest).to receive(:file?).with(path).and_return(true)
+      allow(FileTest).to receive(:exist?).with(path).and_return(true)
+      allow(FileTest).to receive(:executable?).with(path).and_return(true)
     end
-    FileTest.stubs(:file?).with('/etc/grub2-efi.cfg').returns true
-    FileTest.stubs(:file?).with('/boot/grub2/grub.cfg').returns true
-    FileTest.stubs(:exist?).with('/etc/default/grub').returns true
+    allow(FileTest).to receive(:file?).with('/etc/grub2-efi.cfg').and_return(true)
+    allow(FileTest).to receive(:file?).with('/boot/grub2/grub.cfg').and_return(true)
+    allow(FileTest).to receive(:exist?).with('/etc/default/grub').and_return(true)
 
     require 'puppetx/augeasproviders_grub/util'
-    PuppetX::AugeasprovidersGrub::Util.stubs(:grub2_cfg_paths).returns([ '/dev/null' ])
+    allow(PuppetX::AugeasprovidersGrub::Util).to receive(:grub2_cfg_paths).and_return(['/dev/null'])
   end
 
-  context "with full file" do
-    let(:tmptarget) { aug_fixture("full") }
+  context 'with full file' do
+    let(:tmptarget) { aug_fixture('full') }
     let(:target) { tmptarget.path }
 
-    it "should list instances" do
-      provider_class.stubs(:target).returns(target)
-      inst = provider_class.instances.map { |p|
+    it 'lists instances' do
+      allow(provider_class).to receive(:target).and_return(target)
+      inst = provider_class.instances.map do |p|
         {
-          :name => p.get(:name),
-          :ensure => p.get(:ensure),
-          :value => p.get(:value),
-          :bootmode => p.get(:bootmode),
+          name: p.get(:name),
+          ensure: p.get(:ensure),
+          value: p.get(:value),
+          bootmode: p.get(:bootmode),
         }
-      }
-
-      inst.size.should == 7
-      inst[0].should == {:name=>"quiet", :ensure=>:present, :value=>:absent, :bootmode=>"all"}
-      inst[1].should == {:name=>"elevator", :ensure=>:present, :value=>"noop", :bootmode=>"all"}
-      inst[2].should == {:name=>"divider", :ensure=>:present, :value=>"10", :bootmode=>"all"}
-      inst[3].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>"default"}
-      inst[4].should == {:name=>"nohz", :ensure=>:present, :value=>"on", :bootmode=>"default"}
-      inst[5].should == {:name=>"rhgb", :ensure=>:present, :value=>:absent, :bootmode=>"normal"}
-      inst[6].should == {:name=>"nohz", :ensure=>:present, :value=>"on", :bootmode=>"normal"}
-    end
-
-    describe "when creating entries" do
-      before :each do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
       end
 
-      it "should create no-value entries" do
+      expect(inst.size).to eq 7
+      expect(inst[0]).to include(name: 'quiet', ensure: :present, value: :absent, bootmode: 'all')
+      expect(inst[1]).to include(name: 'elevator', ensure: :present, value: 'noop', bootmode: 'all')
+      expect(inst[2]).to include(name: 'divider', ensure: :present, value: '10', bootmode: 'all')
+      expect(inst[3]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'default')
+      expect(inst[4]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'default')
+      expect(inst[5]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'normal')
+      expect(inst[6]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'normal')
+    end
+
+    describe 'when creating entries' do
+      before do
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
+      end
+
+      it 'creates no-value entries' do
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "foo",
-          :ensure   => :present,
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'foo',
+                 ensure: :present,
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -100,14 +101,14 @@ describe provider_class do
         ')
       end
 
-      it "should create entry with value" do
+      it 'creates entry with value' do
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "foo",
-          :ensure   => :present,
-          :value    => "bar",
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'foo',
+                 ensure: :present,
+                 value: 'bar',
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -125,14 +126,14 @@ describe provider_class do
         ')
       end
 
-      it "should create entries with multiple values" do
+      it 'creates entries with multiple values' do
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "foo",
-          :ensure   => :present,
-          :value    => ["bar", "baz"],
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'foo',
+                 ensure: :present,
+                 value: %w[bar baz],
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -151,14 +152,14 @@ describe provider_class do
         ')
       end
 
-      it "should create normal boot-only entries" do
+      it 'creates normal boot-only entries' do
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "foo",
-          :ensure   => :present,
-          :bootmode => :normal,
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'foo',
+                 ensure: :present,
+                 bootmode: :normal,
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -176,14 +177,14 @@ describe provider_class do
         ')
       end
 
-      it "should create default boot-only entries" do
+      it 'creates default boot-only entries' do
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "foo",
-          :ensure   => :present,
-          :bootmode => :default,
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'foo',
+                 ensure: :present,
+                 bootmode: :default,
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -202,29 +203,29 @@ describe provider_class do
       end
     end
 
-    it "should error on recovery-only entries" do
+    it 'errors on recovery-only entries' do
       txn = apply(Puppet::Type.type(:kernel_parameter).new(
-        :name     => "foo",
-        :ensure   => :present,
-        :bootmode => :recovery,
-        :target   => target,
-        :provider => "grub2"
-      ))
+                    name: 'foo',
+                    ensure: :present,
+                    bootmode: :recovery,
+                    target: target,
+                    provider: 'grub2'
+                  ))
 
-      txn.any_failed?.should_not == nil
-      @logs.first.level.should == :err
-      @logs.first.message.include?("Unsupported bootmode").should == true
+      expect(txn.any_failed?).not_to eq nil
+      expect(@logs.first.level).to eq :err
+      expect(@logs.first.message.include?('Unsupported bootmode')).to eq true
     end
 
-    it "should delete entries" do
-      provider_class.any_instance.expects(:mkconfig).returns('OK')
+    it 'deletes entries' do
+      allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
 
       apply!(Puppet::Type.type(:kernel_parameter).new(
-        :name     => "divider",
-        :ensure   => "absent",
-        :target   => target,
-        :provider => "grub2"
-      ))
+               name: 'divider',
+               ensure: 'absent',
+               target: target,
+               provider: 'grub2'
+             ))
 
       augparse_filter(target, LENS, FILTER, '
         { "GRUB_CMDLINE_LINUX"
@@ -240,20 +241,20 @@ describe provider_class do
       ')
     end
 
-    describe "when modifying values" do
-      before :each do
-        provider_class.any_instance.stubs(:create).never
+    describe 'when modifying values' do
+      before do
+        allow_any_instance_of(provider_class).to receive(:create).and_raise('nope')
       end
 
-      it "should change existing values" do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
+      it 'changes existing values' do
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "elevator",
-          :ensure   => :present,
-          :value    => "deadline",
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'elevator',
+                 ensure: :present,
+                 value: 'deadline',
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -270,15 +271,15 @@ describe provider_class do
         ')
       end
 
-      it "should add value to entry" do
-        provider_class.any_instance.expects(:mkconfig).returns('OK')
+      it 'adds value to entry' do
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "quiet",
-          :ensure   => :present,
-          :value    => "foo",
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'quiet',
+                 ensure: :present,
+                 value: 'foo',
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -295,18 +296,18 @@ describe provider_class do
         ')
       end
 
-      it "should add and remove entries for multiple values" do
+      it 'adds and remove entries for multiple values' do
         # This will run once for each parameter resource
-        provider_class.any_instance.expects(:mkconfig).returns('OK').twice
+        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
 
         # Add multiple entries
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "elevator",
-          :ensure   => :present,
-          :value    => ["noop", "deadline"],
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'elevator',
+                 ensure: :present,
+                 value: %w[noop deadline],
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -325,12 +326,12 @@ describe provider_class do
 
         # Remove one excess entry
         apply!(Puppet::Type.type(:kernel_parameter).new(
-          :name     => "elevator",
-          :ensure   => :present,
-          :value    => ["deadline"],
-          :target   => target,
-          :provider => "grub2"
-        ))
+                 name: 'elevator',
+                 ensure: :present,
+                 value: ['deadline'],
+                 target: target,
+                 provider: 'grub2'
+               ))
 
         augparse_filter(target, LENS, FILTER, '
           { "GRUB_CMDLINE_LINUX"
@@ -349,21 +350,21 @@ describe provider_class do
     end
   end
 
-  context "with broken file" do
-    let(:tmptarget) { aug_fixture("broken") }
+  context 'with broken file' do
+    let(:tmptarget) { aug_fixture('broken') }
     let(:target) { tmptarget.path }
 
-    it "should fail to load" do
+    it 'fails to load' do
       txn = apply(Puppet::Type.type(:kernel_parameter).new(
-        :name     => "foo",
-        :ensure   => :present,
-        :target   => target,
-        :provider => "grub2"
-      ))
+                    name: 'foo',
+                    ensure: :present,
+                    target: target,
+                    provider: 'grub2'
+                  ))
 
-      txn.any_failed?.should_not == nil
-      @logs.first.level.should == :err
-      @logs.first.message.include?(target).should == true
+      expect(txn.any_failed?).not_to eq nil
+      expect(@logs.first.level).to eq :err
+      expect(@logs.first.message.include?(target)).to eq true
     end
   end
 end

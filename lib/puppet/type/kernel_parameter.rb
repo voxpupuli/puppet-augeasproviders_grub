@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 # Manages kernel parameters stored in bootloaders such as GRUB.
 #
 # Copyright (c) 2012 Dominic Cleal
 # Licensed under the Apache License, Version 2.0
 
 Puppet::Type.newtype(:kernel_parameter) do
-  @doc = "Manages kernel parameters stored in bootloaders."
+  @doc = 'Manages kernel parameters stored in bootloaders.'
 
   ensurable do
     defaultvalues
@@ -16,12 +18,12 @@ Puppet::Type.newtype(:kernel_parameter) do
     isnamevar
   end
 
-  newproperty(:value, :array_matching => :all) do
+  newproperty(:value, array_matching: :all) do
     desc "Value of the parameter if applicable.  Many parameters are just keywords so this must be left blank, while others (e.g. 'vga') will take a value."
   end
 
   newparam(:target) do
-    desc "The bootloader configuration file, if in a non-default location for the provider."
+    desc 'The bootloader configuration file, if in a non-default location for the provider.'
   end
 
   newparam(:bootmode) do

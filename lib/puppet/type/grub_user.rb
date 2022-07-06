@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Manages GRUB2 Users - Does not apply to GRUB Legacy
 #
 # Author Trevor Vaughan <tvaughan@onyxpoint.com>
@@ -29,13 +31,11 @@ Puppet::Type.newtype(:grub_user) do
     validate do |value|
       # These are items that can separate users in the superusers string and,
       # therefore, should not be valid as a username.
-      if value =~ /\s|,|;|&|\|/
-        raise(Puppet::ParseError, "Usernames may not contain spaces, commas, semicolons, ampersands, or pipes")
-      end
+      raise(Puppet::ParseError, 'Usernames may not contain spaces, commas, semicolons, ampersands, or pipes') if value =~ %r{\s|,|;|&|\|}
     end
   end
 
-  newparam(:superuser, :boolean => true) do
+  newparam(:superuser, boolean: true) do
     desc <<-EOM
       If set, add this user to the 'superusers' list, if no superusers are set,
       but grub_user resources have been declared, a compile error will be
@@ -46,7 +46,7 @@ Puppet::Type.newtype(:grub_user) do
     defaultto(:false)
   end
 
-  newparam(:target, :parent => Puppet::Parameter::Path) do
+  newparam(:target, parent: Puppet::Parameter::Path) do
     desc <<-EOM
       The file to which to write the user information.
 
@@ -56,7 +56,7 @@ Puppet::Type.newtype(:grub_user) do
     defaultto('/etc/grub.d/02_puppet_managed_users')
   end
 
-  newparam(:report_unmanaged, :boolean => true) do
+  newparam(:report_unmanaged, boolean: true) do
     desc <<-EOM
       Report any unmanaged users as a warning during the Puppet run.
     EOM
@@ -70,15 +70,13 @@ Puppet::Type.newtype(:grub_user) do
       The rounds to use when hashing the password.
     EOM
 
-    newvalues(/^\d+$/)
-    defaultto(10000)
+    newvalues(%r{^\d+$})
+    defaultto(10_000)
 
-    munge do |value|
-      value.to_i
-    end
+    munge(&:to_i)
   end
 
-  newproperty(:purge, :boolean => true) do
+  newproperty(:purge, boolean: true) do
     desc <<-EOM
       Purge all unmanaged users.
 
@@ -98,11 +96,11 @@ Puppet::Type.newtype(:grub_user) do
     EOM
 
     validate do |value|
-      raise(Puppet::ParseError, "Passwords must be Strings") unless value.is_a?(String)
+      raise(Puppet::ParseError, 'Passwords must be Strings') unless value.is_a?(String)
     end
 
     def insync?(is)
-      provider.password?(is,should)
+      provider.password?(is, should)
     end
   end
 end

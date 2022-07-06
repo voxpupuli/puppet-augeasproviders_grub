@@ -4,9 +4,9 @@
   "author": "Raphael Pinson, Trevor Vaughan",
   "summary": "Augeas-based grub types and providers for Puppet",
   "license": "Apache-2.0",
-  "source": "https://github.com/hercules-team/augeasproviders_grub",
+  "source": "https://github.com/voxpupuli/augeasproviders_grub",
   "project_page": "http://augeasproviders.com",
-  "issues_url": "https://github.com/hercules-team/augeasproviders_grub/issues",
+  "issues_url": "https://github.com/voxpupuli/augeasproviders_grub/issues",
   "description": "This module provides types/providers for grub configuration files using the Augeas configuration API library.",
   "dependencies": [
     {
@@ -18,49 +18,42 @@
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
-        "7",
-        "8",
         "9"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "14.04",
-        "16.04",
         "18.04",
-        "18.10"
+        "20.04"
       ]
     },
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "6",
         "7",
-        "8.1"
+        "8"
       ]
     },
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "6",
         "7",
-        "8.1"
+        "8"
       ]
     },
     {
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
-        "6",
         "7",
-        "8.1"
+        "8"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 5.0.0 < 8.0.0"
+      "version_requirement": ">= 6.0.0 < 8.0.0"
     }
   ]
 }
