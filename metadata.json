@@ -1,5 +1,5 @@
 {
-  "name": "herculesteam-augeasproviders_grub",
+  "name": "puppet-augeasproviders_grub",
   "version": "4.0.0",
   "author": "Raphael Pinson, Trevor Vaughan",
   "summary": "Augeas-based grub types and providers for Puppet",
@@ -10,7 +10,7 @@
   "description": "This module provides types/providers for grub configuration files using the Augeas configuration API library.",
   "dependencies": [
     {
-      "name": "herculesteam/augeasproviders_core",
+      "name": "puppet/augeasproviders_core",
       "version_requirement": ">=2.4.0 < 4.0.0"
     }
   ],
