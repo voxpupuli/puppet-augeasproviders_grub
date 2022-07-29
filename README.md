@@ -1,10 +1,6 @@
 [![Puppet Forge Version](http://img.shields.io/puppetforge/v/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
 [![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
 [![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
-[![Build Status](https://img.shields.io/travis/hercules-team/augeasproviders_grub/master.svg)](https://travis-ci.org/hercules-team/augeasproviders_grub)
-[![Coverage Status](https://img.shields.io/coveralls/hercules-team/augeasproviders_grub.svg)](https://coveralls.io/r/hercules-team/augeasproviders_grub)
-[![Gemnasium](https://img.shields.io/gemnasium/hercules-team/augeasproviders_grub.svg)](https://gemnasium.com/hercules-team/augeasproviders_grub)
-[![Sponsor](https://img.shields.io/badge/%E2%99%A5-Sponsor-hotpink.svg)](https://github.com/sponsors/raphink)
 
 
 # grub: type/provider for grub files for Puppet
