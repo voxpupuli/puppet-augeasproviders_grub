@@ -1,73 +1,162 @@
 # Changelog
 
-## 4.0.0
+All notable changes to this project will be documented in this file.
+Each new release typically also includes the latest modulesync defaults.
+These should not affect the functionality of the module.
 
-- Update augeasproviders_core version (#67)
-- Puppet 7 support (#64)
-- EL8.1+ support (#64)
-- Call grub2-mkconfig on all targets (#57)
-- Fix grub_menuentry issues (#55 #56 #64)
+## [v4.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v4.0.0) (2022-07-29)
 
-## 3.2.0
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.2.0...v4.0.0)
 
-- Support Puppet 6 (#42)
-- Fix String value issues in grub_config (#46)
-- Fix EFI code for grub_config and grub_menuentry (#48)
-- Add BLS support to grub_menuentry (#50)
+**Breaking changes:**
 
-## 3.1.0
+- Call grub2-mkconfig on all targets [\#57](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/57) ([traylenator](https://github.com/traylenator))
 
-- Add back path for grub.cfg on Debian OS. (#36)
-- Deprecate support for Puppet < 5
-- Support Puppet 5 & 6
-- Update supported OSes in metadata.json
+**Fixed bugs:**
 
-## 3.0.1
-- Fix generation of grub2 user entries
-- Add support for OEL
+- grub\_menuentry resource fail if directory /boot/grub doe not exist [\#53](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/53)
+- grub.cfg isn't being properly updated on EFI systems running CentOS 7 [\#4](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/4)
+- Fix grub\_menuentry issues [\#56](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/56) ([trevor-vaughan](https://github.com/trevor-vaughan))
 
-## 3.0.0
+**Closed issues:**
 
-- Added code to fix the EFI stack on Linux hosts
-- Restricted the RHEL and CentOS support to only what can be tested
-- Pinned supported puppet versions between 4.7.2 and 5.0.0
-  - This is the oldest Puppet, Inc. supported version and there are currently
-    issues in 5.X
+- The mkconfig update in \#4 needs to be ported to the other providers [\#63](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/63)
+- kernel\_parameters set incorrectly on CentOS 8 [\#58](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/58)
+- Typo in provider grub for custom type grub\_menuentry [\#54](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/54)
+- Kernel\_parameter subscribe executes on every run [\#41](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/41)
+- More informative error message for missing dependency [\#34](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/34)
+- Support for Puppet 4 [\#26](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/26)
+- Issue w/Puppet 2016.x [\#24](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/24)
 
-## 2.4.0
+**Merged pull requests:**
 
-- Add support for global GRUB configuration
-- Add support for grub_menuentry providing the ability to manage individual
-  menu entries for both GRUB Legacy and GRUB2
-- Add support for managing GRUB2 users
-- The following custom types were created:
-  * grub_config :  Manages global GRUB settings
-  * grub_menuentry : Manages GRUB menuentries
-  * grub_user : Manages GRUB2 users
-- Confine GRUB providers to presence of menus, prefer GRUB 2 (#8)
-- Fix build on Ruby 1.8
+- Update augeasproviders\_core version [\#67](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/67) ([sazzle2611](https://github.com/sazzle2611))
+- Fix mkconfig calls [\#64](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/64) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- error message improvement: specify that it's a missing module [\#61](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/61) ([kenyon](https://github.com/kenyon))
+- Fix typo in grub\_menuentry provider [\#55](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/55) ([trevor-vaughan](https://github.com/trevor-vaughan))
 
-## 2.3.0
+## [3.2.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.2.0) (2020-03-31)
 
-- Fix GRUB_CMDLINE_LINUX_DEFAULT (issue #14)
-- Add grub.cfg location for UEFI systems (issue #16)
-- Add two defaults in grub2 provider (issue #17)
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.1.0...3.2.0)
 
-## 2.2.0
+**Fixed bugs:**
 
-- Add support for bootmode 'default' (issue #3)
+- grub\_menuentry is broken in EL8 and Fedora 30+ [\#49](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/49)
 
-## 2.1.0
+**Closed issues:**
 
-- Set default to grub2 provider on el7 based systems (fix #9)
-- Load lenses from lib/augeas/lenses in tests
-- Add Puppet 4 to test matrix
+- grub\_config values with spaces cause augeas errors [\#44](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/44)
+- Absent GRUB\_CMDLINE\_LINUX\_DEFAULT can result in duplicated kernel parameters. [\#38](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/38)
+- The grub2 system should update both the EFI and non-EFI configurations when triggered [\#37](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/37)
 
-## 2.0.1
+**Merged pull requests:**
 
-- Fix metadata.json
-- Various minor updates to Travis test configuration
+- Add BLS support to grub\_menuentry [\#50](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/50) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- Fixed the EFI code for grub\_config and grub\_menuentry [\#48](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/48) ([tparkercbn](https://github.com/tparkercbn))
+- Fix String value issues in grub\_config [\#46](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/46) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- Puppet6 [\#42](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/42) ([raphink](https://github.com/raphink))
 
-## 2.0.0
+## [3.1.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.1.0) (2019-02-28)
 
-- First release of split module.
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.0.1...3.1.0)
+
+**Closed issues:**
+
+- Hard dependency on grub2-tools on CentOS7 missing [\#20](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/20)
+
+**Merged pull requests:**
+
+- Add back path for grub.cfg on Debian OS. [\#36](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/36) ([olifre](https://github.com/olifre))
+
+## [3.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.0.1) (2018-05-09)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.0.0...3.0.1)
+
+**Closed issues:**
+
+- EFI support for all oses, not only fedora [\#27](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/27)
+
+**Merged pull requests:**
+
+- Grub2 grub\_user fix [\#32](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/32) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- Update grub2.rb for EFI systems [\#29](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/29) ([cohdjn](https://github.com/cohdjn))
+
+## [3.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.0.0) (2017-08-29)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.4.0...3.0.0)
+
+**Closed issues:**
+
+- Unable to set/determine correct provider on Arch Linux [\#22](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/22)
+
+**Merged pull requests:**
+
+- Add Global EFI support [\#28](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/28) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- Raise exception on missing augeasproviders\_core [\#25](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/25) ([igalic](https://github.com/igalic))
+
+## [2.4.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.4.0) (2016-05-03)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.3.0...2.4.0)
+
+**Implemented enhancements:**
+
+- Requesting support for grub 'module' statements [\#10](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/10)
+- Confine GRUB providers to presence of menus, prefer GRUB 2 [\#8](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/8) ([ckoenig](https://github.com/ckoenig))
+
+**Closed issues:**
+
+- Fails on CentOS 6 [\#6](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/6)
+
+**Merged pull requests:**
+
+- Update grub2.rb to add On UEFI Systems, grub.cfg [\#21](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/21) ([stivesso](https://github.com/stivesso))
+- Updated the Changelog [\#19](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/19) ([trevor-vaughan](https://github.com/trevor-vaughan))
+- Added support for global GRUB configuration [\#18](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/18) ([trevor-vaughan](https://github.com/trevor-vaughan))
+
+## [2.3.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.3.0) (2016-02-18)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.2.0...2.3.0)
+
+**Closed issues:**
+
+- wrong version of grub detection on Ubuntu Trusty [\#13](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/13)
+- Grub2 does not add the /files/etc/default/grub/GRUB\_CMDLINE\_LINUX\_DEFAULT path if it is missing [\#11](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/11)
+
+**Merged pull requests:**
+
+- adding 2 defaults for grub 2 [\#17](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/17) ([wanix](https://github.com/wanix))
+- add grub.cfg location for grub2 on UEFI systems [\#16](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/16) ([tedwardia](https://github.com/tedwardia))
+- Fix GRUB\_CMDLINE\_LINUX\_DEFAULT [\#14](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/14) ([trevor-vaughan](https://github.com/trevor-vaughan))
+
+## [2.2.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.2.0) (2016-01-04)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.1.0...2.2.0)
+
+## [2.1.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.1.0) (2015-11-17)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.0.1...2.1.0)
+
+**Closed issues:**
+
+- undefined method `provider' for nil:NilClass [\#12](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/12)
+- Wrong provider selected in Centos7 [\#7](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/7)
+
+**Merged pull requests:**
+
+- Set default to grub2 provider on el7 based systems [\#9](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/9) ([vinzent](https://github.com/vinzent))
+
+## [2.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.0.1) (2014-12-10)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.0.0...2.0.1)
+
+**Closed issues:**
+
+- Undefined method "provider" on Centos 6.5 [\#2](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/2)
+
+## [2.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.0.0) (2014-08-11)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/a9a2ad1f0685c21d9f0e5fd222c12f21b029a40b...2.0.0)
+
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
