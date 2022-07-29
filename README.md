@@ -1,10 +1,6 @@
-[![Puppet Forge Version](http://img.shields.io/puppetforge/v/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
-[![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
-[![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/herculesteam/augeasproviders_grub.svg)](https://forge.puppetlabs.com/herculesteam/augeasproviders_grub)
-[![Build Status](https://img.shields.io/travis/hercules-team/augeasproviders_grub/master.svg)](https://travis-ci.org/hercules-team/augeasproviders_grub)
-[![Coverage Status](https://img.shields.io/coveralls/hercules-team/augeasproviders_grub.svg)](https://coveralls.io/r/hercules-team/augeasproviders_grub)
-[![Gemnasium](https://img.shields.io/gemnasium/hercules-team/augeasproviders_grub.svg)](https://gemnasium.com/hercules-team/augeasproviders_grub)
-[![Sponsor](https://img.shields.io/badge/%E2%99%A5-Sponsor-hotpink.svg)](https://github.com/sponsors/raphink)
+[![Puppet Forge Version](http://img.shields.io/puppetforge/v/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
 
 
 # grub: type/provider for grub files for Puppet
@@ -33,7 +29,7 @@ support if you are on a systen that uses BLS!
 
 On Puppet 2.7.14+, the module can be installed easily ([documentation](http://docs.puppetlabs.com/puppet/latest/reference/modules_installing.html)):
 
-    puppet module install herculesteam/augeasproviders_grub
+    puppet module install puppet/augeasproviders_grub
 
 You may see an error similar to this on Puppet 2.x ([#13858](http://projects.puppetlabs.com/issues/13858)):
 
@@ -70,7 +66,7 @@ time due to lack of available lenses.
 ## Documentation and examples
 
 Type documentation can be generated with `puppet doc -r type` or viewed on the
-[Puppet Forge page](http://forge.puppetlabs.com/herculesteam/augeasproviders_grub).
+[Puppet Forge page](http://forge.puppetlabs.com/puppet/augeasproviders_grub).
 
 
 ### kernel_parameter provider
@@ -254,4 +250,4 @@ restrictions on your entries.
 ## Issues
 
 Please file any issues or suggestions
-[on GitHub](https://github.com/hercules-team/augeasproviders_grub/issues).
+[on GitHub](https://github.com/voxpupuli/augeasproviders_grub/issues).
