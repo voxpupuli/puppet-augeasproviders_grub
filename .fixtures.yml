@@ -1,5 +1,4 @@
 ---
 fixtures:
   repositories:
-    augeasproviders_core:
-      repo: "https://github.com/voxpupuli/augeasproviders_core"
+    augeasproviders_core: "https://github.com/voxpupuli/puppet-augeasproviders_core"
