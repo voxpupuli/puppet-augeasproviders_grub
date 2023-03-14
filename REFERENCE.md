@@ -37,11 +37,11 @@ Value of the GRUB parameter.
 
 The following parameters are available in the `grub_config` type.
 
-* [`name`](#name)
-* [`provider`](#provider)
-* [`target`](#target)
+* [`name`](#-grub_config--name)
+* [`provider`](#-grub_config--provider)
+* [`target`](#-grub_config--target)
 
-##### <a name="name"></a>`name`
+##### <a name="-grub_config--name"></a>`name`
 
 namevar
 
@@ -60,12 +60,12 @@ With GRUB >= 2, this will be 'GRUB_DEFAULT', 'GRUB_SAVEDEFAULT', etc..
 
 See `info grub2` for additional information.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-grub_config--provider"></a>`provider`
 
 The specific backend to use for this `grub_config` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### <a name="target"></a>`target`
+##### <a name="-grub_config--target"></a>`target`
 
 The bootloader configuration file, if in a non-default location for the
 provider.
@@ -83,7 +83,7 @@ The following properties are available in the `grub_menuentry` type.
 
 ##### `bls`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Explicitly enable, or disable, BLS support for this resource.
 
@@ -95,7 +95,7 @@ Add this Array of classes to the menuentry.
 
 ##### `default_entry`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If set, make this menu entry the default entry.
 
@@ -165,7 +165,7 @@ Default value: `:preserve:`
 
 ##### `load_16bit`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If set, ensure that `linux16` and `initrd16` are used for the kernel entries.
 
@@ -173,7 +173,7 @@ Will default to `true` unless the entry is a BLS entry.
 
 ##### `load_video`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If true, add the `load_video` command to the menuentry.
 
@@ -181,7 +181,7 @@ Will default to `true` unless the entry is a BLS entry.
 
 ##### `makeactive`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 In Legacy GRUB, having this set will add a 'makeactive' entry to the menuentry.
 
@@ -244,34 +244,34 @@ Default value: `[:unrestricted]`
 
 The following parameters are available in the `grub_menuentry` type.
 
-* [`add_defaults_on_creation`](#add_defaults_on_creation)
-* [`name`](#name)
-* [`provider`](#provider)
-* [`target`](#target)
+* [`add_defaults_on_creation`](#-grub_menuentry--add_defaults_on_creation)
+* [`name`](#-grub_menuentry--name)
+* [`provider`](#-grub_menuentry--provider)
+* [`target`](#-grub_menuentry--target)
 
-##### <a name="add_defaults_on_creation"></a>`add_defaults_on_creation`
+##### <a name="-grub_menuentry--add_defaults_on_creation"></a>`add_defaults_on_creation`
 
-Valid values: ``true``, ``false``, `yes`, `no`
+Valid values: `true`, `false`, `yes`, `no`
 
 If set, when using the ':preserve:' option in `kernel_options` or
 `modules` will add the system defaults if the entry is being first
 created. This is the same technique that grub2-mkconfig uses when
 procesing entries.
 
-Default value: ``true``
+Default value: `true`
 
-##### <a name="name"></a>`name`
+##### <a name="-grub_menuentry--name"></a>`name`
 
 namevar
 
 The name of the menu entry.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-grub_menuentry--provider"></a>`provider`
 
 The specific backend to use for this `grub_menuentry` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### <a name="target"></a>`target`
+##### <a name="-grub_menuentry--target"></a>`target`
 
 The bootloader configuration file, if in a non-default location for the
 provider.
@@ -303,7 +303,7 @@ form, it will be automatically converted.
 
 ##### `purge`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Purge all unmanaged users.
 
@@ -317,33 +317,33 @@ Default value: `false`
 
 The following parameters are available in the `grub_user` type.
 
-* [`name`](#name)
-* [`provider`](#provider)
-* [`report_unmanaged`](#report_unmanaged)
-* [`rounds`](#rounds)
-* [`superuser`](#superuser)
-* [`target`](#target)
+* [`name`](#-grub_user--name)
+* [`provider`](#-grub_user--provider)
+* [`report_unmanaged`](#-grub_user--report_unmanaged)
+* [`rounds`](#-grub_user--rounds)
+* [`superuser`](#-grub_user--superuser)
+* [`target`](#-grub_user--target)
 
-##### <a name="name"></a>`name`
+##### <a name="-grub_user--name"></a>`name`
 
 namevar
 
 The username of the GRUB2 user to be managed.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-grub_user--provider"></a>`provider`
 
 The specific backend to use for this `grub_user` resource. You will seldom need to specify this --- Puppet will usually
 discover the appropriate provider for your platform.
 
-##### <a name="report_unmanaged"></a>`report_unmanaged`
+##### <a name="-grub_user--report_unmanaged"></a>`report_unmanaged`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Report any unmanaged users as a warning during the Puppet run.
 
-Default value: ``false``
+Default value: `false`
 
-##### <a name="rounds"></a>`rounds`
+##### <a name="-grub_user--rounds"></a>`rounds`
 
 Valid values: `%r{^\d+$}`
 
@@ -351,17 +351,17 @@ The rounds to use when hashing the password.
 
 Default value: `10_000`
 
-##### <a name="superuser"></a>`superuser`
+##### <a name="-grub_user--superuser"></a>`superuser`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 If set, add this user to the 'superusers' list, if no superusers are set,
 but grub_user resources have been declared, a compile error will be
 raised.
 
-Default value: ``false``
+Default value: `false`
 
-##### <a name="target"></a>`target`
+##### <a name="-grub_user--target"></a>`target`
 
 The file to which to write the user information.
 
@@ -393,12 +393,12 @@ Value of the parameter if applicable.  Many parameters are just keywords so this
 
 The following parameters are available in the `kernel_parameter` type.
 
-* [`bootmode`](#bootmode)
-* [`name`](#name)
-* [`provider`](#provider)
-* [`target`](#target)
+* [`bootmode`](#-kernel_parameter--bootmode)
+* [`name`](#-kernel_parameter--name)
+* [`provider`](#-kernel_parameter--provider)
+* [`target`](#-kernel_parameter--target)
 
-##### <a name="bootmode"></a>`bootmode`
+##### <a name="-kernel_parameter--bootmode"></a>`bootmode`
 
 Valid values: `all`, `default`, `normal`, `recovery`
 
@@ -407,18 +407,18 @@ mode), 'default' for just the default boot entry, 'normal' for just normal boots
 
 Default value: `all`
 
-##### <a name="name"></a>`name`
+##### <a name="-kernel_parameter--name"></a>`name`
 
 namevar
 
 The parameter name, e.g. 'quiet' or 'vga'.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-kernel_parameter--provider"></a>`provider`
 
 The specific backend to use for this `kernel_parameter` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### <a name="target"></a>`target`
+##### <a name="-kernel_parameter--target"></a>`target`
 
 The bootloader configuration file, if in a non-default location for the provider.
 
