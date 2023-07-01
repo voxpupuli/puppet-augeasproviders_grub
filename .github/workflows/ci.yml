@@ -13,7 +13,6 @@ concurrency:
 jobs:
   puppet:
     name: Puppet
-    # Acceptance tests do not work with Docker
     uses: voxpupuli/gha-puppet/.github/workflows/basic.yml@v1
     with:
       additional_packages: 'libaugeas-dev augeas-tools'
