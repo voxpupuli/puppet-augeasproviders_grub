@@ -17,7 +17,7 @@ Puppet::Type.type(:grub_user).provide(:grub2, parent: Puppet::Type.type(:augeasp
   confine exists: mkconfig_path, for_binary: true
 
   def mkconfig
-    execute(mkconfig_path, { failonfail: true, combine: false })
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
   end
 
   confine exists: '/etc/grub.d'

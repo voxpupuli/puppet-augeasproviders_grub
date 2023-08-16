@@ -32,7 +32,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
   confine exists: mkconfig_path, for_binary: true
 
   def mkconfig
-    execute(mkconfig_path, { failonfail: true, combine: false })
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
   end
 
   # when both grub* providers match, prefer GRUB 2

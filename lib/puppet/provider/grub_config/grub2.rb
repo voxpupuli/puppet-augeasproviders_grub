@@ -24,7 +24,7 @@ Puppet::Type.type(:grub_config).provide(:grub2, parent: Puppet::Type.type(:augea
   confine exists: mkconfig_path, for_binary: true
 
   def mkconfig
-    execute(mkconfig_path, { failonfail: true, combine: false })
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
   end
 
   defaultfor osfamily: :RedHat
