@@ -14,7 +14,11 @@ Puppet::Type.type(:grub_user).provide(:grub2, parent: Puppet::Type.type(:augeasp
     which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  commands mkconfig: mkconfig_path
+  confine exists: mkconfig_path, for_binary: true
+
+  def mkconfig
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
+  end
 
   confine exists: '/etc/grub.d'
 

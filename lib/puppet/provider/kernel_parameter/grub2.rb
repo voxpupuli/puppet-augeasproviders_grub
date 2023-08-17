@@ -28,7 +28,12 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
 
   confine feature: :augeas
   defaultfor augeasprovider_grub_version: 2
-  commands mkconfig: mkconfig_path
+
+  confine exists: mkconfig_path, for_binary: true
+
+  def mkconfig
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
+  end
 
   # when both grub* providers match, prefer GRUB 2
   def self.specificity

@@ -250,7 +250,12 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
 
   #### End Class Methods
 
-  commands mkconfig: mkconfig_path
+  confine exists: mkconfig_path, for_binary: true
+
+  def mkconfig
+    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
+  end
+
   commands grubby: 'grubby'
   commands grub_set_default: 'grub2-set-default'
 
