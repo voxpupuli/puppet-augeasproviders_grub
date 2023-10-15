@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v5.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.0.1) (2023-10-15)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.0.0...v5.0.1)
+
+**Fixed bugs:**
+
+- v4.0.0: Standard error of `grub-mkconfig` written to `grub.cfg` [\#74](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/74)
+
+**Merged pull requests:**
+
+- Drop stderr from mkconfig output when updating grub  [\#84](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/84) ([glangloi](https://github.com/glangloi))
+
 ## [v5.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.0.0) (2023-06-22)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v4.0.0...v5.0.0)
