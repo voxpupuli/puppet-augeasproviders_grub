@@ -5,7 +5,7 @@
   "summary": "Augeas-based grub types and providers for Puppet",
   "license": "Apache-2.0",
   "source": "https://github.com/voxpupuli/augeasproviders_grub",
-  "project_page": "http://augeasproviders.com",
+  "project_page": "https://github.com/voxpupuli/puppet-augeasproviders_grub",
   "issues_url": "https://github.com/voxpupuli/augeasproviders_grub/issues",
   "description": "This module provides types/providers for grub configuration files using the Augeas configuration API library.",
   "dependencies": [
