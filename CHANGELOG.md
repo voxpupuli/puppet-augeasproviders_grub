@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v5.1.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.0) (2023-10-30)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.0.1...v5.1.0)
+
+**Implemented enhancements:**
+
+- Add EL9 support [\#92](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/92) ([bastelfreak](https://github.com/bastelfreak))
+- Add AlmaLinux/Rocky support [\#91](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/91) ([bastelfreak](https://github.com/bastelfreak))
+- Add Ubuntu 22.04 support [\#90](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/90) ([bastelfreak](https://github.com/bastelfreak))
+- Add Debian 12 support [\#89](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/89) ([bastelfreak](https://github.com/bastelfreak))
+
+**Merged pull requests:**
+
+- Update project page to point to github repo [\#88](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/88) ([tuxmea](https://github.com/tuxmea))
+
 ## [v5.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.0.1) (2023-10-15)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.0.0...v5.0.1)
