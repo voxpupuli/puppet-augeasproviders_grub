@@ -22,4 +22,3 @@ jobs:
     with:
       pidfile_workaround: 'false'
       additional_packages: 'libaugeas-dev augeas-tools'
-      beaker_hypervisor: 'vagrant_libvirt'
