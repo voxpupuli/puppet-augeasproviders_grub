@@ -1,6 +1,7 @@
 ---
 .github/workflows/ci.yml:
-  additional_packages: libaugeas-dev augeas-tools
+  with:
+    additional_packages: libaugeas-dev augeas-tools
 Gemfile:
   optional:
     ':test':
