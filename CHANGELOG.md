@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v5.1.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.1) (2024-07-09)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.0...v5.1.1)
+
+**Fixed bugs:**
+
+- RHEL \>= 9.3 - `grub2-mkconfig` does not update BLS kernel options anymore per default [\#95](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/95)
+- Update BLS kernel options on EL \>= 9.3 [\#98](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/98) ([silug](https://github.com/silug))
+
 ## [v5.1.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.0) (2023-10-30)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.0.1...v5.1.0)
