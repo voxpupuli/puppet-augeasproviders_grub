@@ -35,12 +35,19 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
   #
   # @return (String) The commandline
   def self.mkconfig_cmdline
-    cmdline = [self.mkconfig_path]
-    if ((Facter.value(:os) && Facter.value(:os)['family']) == 'RedHat')
-      if ((Facter.value(:os)['release']['major'].to_i == 9) && (Facter.value(:os)['release']['minor'].to_i >= 3)) || (Facter.value(:os)['release']['major'].to_i > 9)
-        cmdline = cmdline.append("--update-bls-cmdline")
-      end
+    needs_bls_cmdline = lambda do
+      os = Facter.value(:os)
+      return false unless os.is_a?(Hash)
+
+      return false unless os['family'] == 'RedHat'
+      return false if os['release']['major'].to_i < 9
+      return false if os['release']['major'].to_i == 9 && os['release']['minor'].to_i < 3
+
+      true
     end
+
+    cmdline = [mkconfig_path]
+    cmdline << '--update-bls-cmdline' if needs_bls_cmdline.call
     cmdline
   end
 
