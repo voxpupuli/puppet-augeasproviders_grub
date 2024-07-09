@@ -17,7 +17,9 @@ group :development do
 end
 
 group :system_tests do
-  gem 'voxpupuli-acceptance', '~> 3.0',  :require => false
+  # gem 'voxpupuli-acceptance', '~> 3.0',  :require => false
+  gem 'voxpupuli-acceptance', git: 'https://github.com/voxpupuli/voxpupuli-acceptance', branch: 'vagrant'
+  gem 'beaker-rspec', git: 'https://github.com/voxpupuli/beaker-rspec', branch: 'vagrant'
 end
 
 group :release do
