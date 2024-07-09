@@ -1,9 +1,14 @@
-[![Puppet Forge Version](http://img.shields.io/puppetforge/v/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
-[![Puppet Forge Downloads](http://img.shields.io/puppetforge/dt/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
-[![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
-
-
 # grub: type/provider for grub files for Puppet
+
+[![Build Status](https://github.com/voxpupuli/puppet-augeasproviders_grub/workflows/CI/badge.svg)](https://github.com/voxpupuli/puppet-augeasproviders_grub/actions?query=workflow%3ACI)
+[![Release](https://github.com/voxpupuli/puppet-augeasproviders_grub/actions/workflows/release.yml/badge.svg)](https://github.com/voxpupuli/puppet-augeasproviders_grub/actions/workflows/release.yml)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![Puppet Forge - endorsement](https://img.shields.io/puppetforge/e/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![Puppet Forge - scores](https://img.shields.io/puppetforge/f/puppet/augeasproviders_grub.svg)](https://forge.puppetlabs.com/puppet/augeasproviders_grub)
+[![puppetmodule.info docs](https://www.puppetmodule.info/images/badge.svg)](https://www.puppetmodule.info/m/puppet-augeasproviders_grub)
+[![Apache-2 License](https://img.shields.io/github/license/voxpupuli/puppet-augeasproviders_grub.svg)](LICENSE)
+[![Donated by Herculesteam](https://img.shields.io/badge/donated%20by-herculesteam-fb7047.svg)](#transfer-notice)
 
 This module provides a new type/provider for Puppet to read and modify grub
 config files using the Augeas configuration library.
@@ -251,3 +256,11 @@ restrictions on your entries.
 
 Please file any issues or suggestions
 [on GitHub](https://github.com/voxpupuli/augeasproviders_grub/issues).
+
+## Transfer Notice
+
+This module was originally authored by [hercules-team](http://augeasproviders.com).
+The maintainer preferred that Vox Pupuli take ownership of the module for future improvement and maintenance.
+Existing pull requests and issues were transferred over, please fork and continue to contribute here.
+
+Previously: https://github.com/hercules-team/augeasproviders_grub
