@@ -18,6 +18,7 @@ concurrency:
 jobs:
   puppet:
     name: Puppet
-    uses: voxpupuli/gha-puppet/.github/workflows/basic.yml@v2
+    uses: voxpupuli/gha-puppet/.github/workflows/beaker.yml@v2
     with:
       additional_packages: 'libaugeas-dev augeas-tools'
+      beaker_hypervisor: vagrant_libvirt
