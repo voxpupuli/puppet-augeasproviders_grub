@@ -31,8 +31,28 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
 
   confine exists: mkconfig_path, for_binary: true
 
+  # Add BLS specific option to mkconfig command if needed
+  #
+  # @return (String) The commandline
+  def self.mkconfig_cmdline
+    needs_bls_cmdline = lambda do
+      os = Facter.value(:os)
+      return false unless os.is_a?(Hash)
+
+      return false unless os['family'] == 'RedHat'
+      return false if os['release']['major'].to_i < 9
+      return false if os['release']['major'].to_i == 9 && os['release']['minor'].to_i < 3
+
+      true
+    end
+
+    cmdline = [mkconfig_path]
+    cmdline << '--update-bls-cmdline' if needs_bls_cmdline.call
+    cmdline
+  end
+
   def mkconfig
-    execute(self.class.mkconfig_path, { failonfail: true, combine: false })
+    execute(self.class.mkconfig_cmdline, { failonfail: true, combine: false })
   end
 
   # when both grub* providers match, prefer GRUB 2
