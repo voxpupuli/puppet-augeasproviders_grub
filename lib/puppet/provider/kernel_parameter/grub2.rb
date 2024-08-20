@@ -40,6 +40,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
       return false unless os.is_a?(Hash)
 
       return false unless os['family'] == 'RedHat'
+      return false if os['name'] == 'Amazon'
       return false if os['release']['major'].to_i < 9
       return false if os['release']['major'].to_i == 9 && os['release']['minor'].to_i < 3
 

@@ -68,6 +68,13 @@
         "8",
         "9"
       ]
+    },
+    {
+      "operatingsystem": "Amazon",
+      "operatingsystemrelease": [
+        "2",
+        "2023"
+      ]
     }
   ],
   "requirements": [
