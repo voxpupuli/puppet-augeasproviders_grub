@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v5.1.2](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.2) (2024-08-22)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.1...v5.1.2)
+
+**Fixed bugs:**
+
+- fix: limit scope of update-bls-cmdline to RHEL9 [\#104](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/104) ([vchepkov](https://github.com/vchepkov))
+
 ## [v5.1.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.1) (2024-07-09)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.0...v5.1.1)
