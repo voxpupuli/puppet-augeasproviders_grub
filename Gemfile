@@ -17,10 +17,7 @@ group :development do
 end
 
 group :system_tests do
-  # gem 'voxpupuli-acceptance', '~> 3.0',  :require => false
-  gem 'voxpupuli-acceptance', git: 'https://github.com/voxpupuli/voxpupuli-acceptance', branch: 'vagrant'
-  gem 'beaker-vagrant', git: 'https://github.com/bastelfreak/beaker-vagrant', branch: 'vagrant'
-  gem 'beaker-rspec', git: 'https://github.com/voxpupuli/beaker-rspec', branch: 'vagrant'
+  gem 'voxpupuli-acceptance', '~> 3.0',  :require => false
 end
 
 group :release do
@@ -30,7 +27,7 @@ end
 gem 'rake', :require => false
 gem 'facter', ENV['FACTER_GEM_VERSION'], :require => false, :groups => [:test]
 
-puppetversion = ENV['PUPPET_GEM_VERSION'] || '~> 7.24'
+puppetversion = ENV['PUPPET_GEM_VERSION'] || [">= 7.24", "< 9"]
 gem 'puppet', puppetversion, :require => false, :groups => [:test]
 
 # vim: syntax=ruby

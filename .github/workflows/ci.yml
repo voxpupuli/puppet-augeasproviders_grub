@@ -4,6 +4,7 @@
 
 name: CI
 
+# yamllint disable-line rule:truthy
 on:
   pull_request: {}
   push:
@@ -21,6 +22,6 @@ jobs:
     uses: voxpupuli/gha-puppet/.github/workflows/beaker.yml@v3
     with:
       additional_packages: 'libaugeas-dev augeas-tools'
-      beaker_hypervisor: vagrant_libvirt
-      acceptance_runs_on: macarne
+      beaker_hypervisor: 'vagrant_libvirt'
+      acceptance_runs_on: 'macarne'
       install_vagrant_dependencies: false
