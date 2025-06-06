@@ -22,13 +22,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  defaultfor osfamily: 'Redhat', operatingsystemmajrelease: ['7']
-  defaultfor operatingsystem: 'Debian', operatingsystemmajrelease: ['8']
-  defaultfor operatingsystem: 'Ubuntu', operatingsystemmajrelease: ['14.04']
-
   confine feature: :augeas
-  defaultfor augeasprovider_grub_version: 2
-
   confine exists: mkconfig_path, for_binary: true
 
   # Add BLS specific option to mkconfig command if needed
