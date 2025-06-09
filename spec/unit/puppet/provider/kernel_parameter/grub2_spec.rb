@@ -27,9 +27,6 @@ end
 
 describe provider_class do
   before do
-    Facter.clear
-    allow(Facter).to receive(:fact).with(:augeasprovider_grub_version).and_return(Facter.add(:augeasprovider_grub_version) { setcode { 2 } })
-
     allow_any_instance_of(provider_class).to receive(:default?).and_return(true)
     allow(FileTest).to receive(:exist?).and_return(false)
     allow(FileTest).to receive(:file?).and_return(false)
