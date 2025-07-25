@@ -131,6 +131,19 @@ module PuppetX
           ''
       end
 
+      # Return true if we want to include /boot/efi/EFI/#{os_name}/grub.cfg
+      # in being updated with grub2_mkconfig. To keep behavior same: true if
+      # family is not redhat or  EL < 9.
+      # In other places in this file, os_name should really be family, but I
+      # am not experiencing any issues with OracleLinux, and don't have other
+      # linux's to test, so will leave it.
+      # @return (Boolean)
+      def self.el_lt_9
+        major = Facter.value(:os).dig('release','major') || 0
+        family = Facter.value(:os).dig('family').downcase || ''
+        (family !~/redhat/) or (major.to_i < 9)
+      end
+
       # Return the location of all valid GRUB2 configurations on the system.
       #
       # @raise (Puppet::Error) if no path is found
@@ -140,10 +153,11 @@ module PuppetX
         paths = [
           '/etc/grub2.cfg',
           '/etc/grub2-efi.cfg',
-          "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
           '/boot/grub2/grub.cfg',
           '/boot/grub/grub.cfg'
         ]
+
+        paths << "/boot/efi/EFI/#{os_name.downcase}/grub.cfg" if el_lt_9
 
         valid_paths = paths.map do |path|
           real_path = File.realpath(path)
