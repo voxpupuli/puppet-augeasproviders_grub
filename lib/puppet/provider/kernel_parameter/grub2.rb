@@ -34,7 +34,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     # Fedora and Amazon Linux lack support and are excluded
     # since they don't have a release with major version 9
     needs_bls_cmdline = os.is_a?(Hash) && os['family'] == 'RedHat' &&
-                        os['release']['major'].to_i == 9 && os['release']['minor'].to_i >= 3
+                        ((os['release']['major'].to_i == 9 && os['release']['minor'].to_i >= 3) || (os['release']['major'].to_i >= 10))
 
     cmdline = [mkconfig_path]
     cmdline << '--update-bls-cmdline' if needs_bls_cmdline
