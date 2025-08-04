@@ -146,10 +146,21 @@ module PuppetX
         ]
 
         valid_paths = paths.map do |path|
-          real_path = File.realpath(path)
-          real_path if File.readable?(real_path) && !File.directory?(real_path)
-        rescue Errno::ENOENT
-          nil
+          real_path = nil
+
+          if File.readable?(path) && !File.directory?(path)
+            real_path = File.realpath(path)
+
+            # Exclude stub files which include main config (e.g. Debian OS family)
+            File.foreach(real_path) do |line|
+              if line.match(%r{^configfile}s)
+                real_path = nil
+                break
+              end
+            end
+          end
+
+          real_path
         end.compact.uniq
 
         raise(%(No grub configuration found at '#{paths.join("', '")}')) if valid_paths.empty?
