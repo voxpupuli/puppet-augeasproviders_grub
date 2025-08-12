@@ -22,13 +22,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     which('grub2-mkconfig') or which('grub-mkconfig') or '/usr/sbin/grub-mkconfig'
   end
 
-  defaultfor osfamily: 'Redhat', operatingsystemmajrelease: ['7']
-  defaultfor operatingsystem: 'Debian', operatingsystemmajrelease: ['8']
-  defaultfor operatingsystem: 'Ubuntu', operatingsystemmajrelease: ['14.04']
-
   confine feature: :augeas
-  defaultfor augeasprovider_grub_version: 2
-
   confine exists: mkconfig_path, for_binary: true
 
   # Add BLS specific option to mkconfig command if needed
@@ -40,7 +34,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     # Fedora and Amazon Linux lack support and are excluded
     # since they don't have a release with major version 9
     needs_bls_cmdline = os.is_a?(Hash) && os['family'] == 'RedHat' &&
-                        os['release']['major'].to_i == 9 && os['release']['minor'].to_i >= 3
+                        ((os['release']['major'].to_i == 9 && os['release']['minor'].to_i >= 3) || (os['release']['major'].to_i >= 10))
 
     cmdline = [mkconfig_path]
     cmdline << '--update-bls-cmdline' if needs_bls_cmdline
