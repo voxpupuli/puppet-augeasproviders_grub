@@ -29,6 +29,8 @@ Puppet::Type.newtype(:kernel_parameter) do
   newparam(:bootmode) do
     desc "Boot mode(s) to apply the parameter to.  Either 'all' (default) to use the parameter on all boots (normal and recovery mode), 'default' for just the default boot entry, 'normal' for just normal boots or 'recovery' for just recovery boots."
 
+    isnamevar
+
     newvalues :all, :default, :normal, :recovery
 
     defaultto :all
@@ -36,5 +38,26 @@ Puppet::Type.newtype(:kernel_parameter) do
 
   autorequire(:file) do
     self[:target]
+  end
+
+  # title_patterns method for mapping titles to namevars for supporting
+  # composite namevars.
+  # https://github.com/puppetlabs/puppetlabs-java_ks/blob/5bc34745a6f86e0c4af495e0ad3559c82d57873a/lib/puppet/type/java_ks.rb#L209
+  def self.title_patterns
+    [
+      [
+        %r{^([^:]+)$},
+        [
+          [:name],
+        ],
+      ],
+      [
+        %r{^(.*):(.*)$},
+        [
+          [:name],
+          [:bootmode],
+        ],
+      ],
+    ]
   end
 end
