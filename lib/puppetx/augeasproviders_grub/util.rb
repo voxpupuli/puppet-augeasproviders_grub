@@ -1,7 +1,21 @@
 # frozen_string_literal: true
 
+# @summary Top-level namespace for extensions to core Puppet code.
+# @api public
 module PuppetX
+  # @summary Namespace for Augeasproviders GRUB specific helpers.
+  # @api public
   module AugeasprovidersGrub
+    # @summary Collection of pure-Ruby utility methods used by GRUB related
+    #   types and providers in this module. These helpers manipulate kernel
+    #   option arrays, locate and read GRUB2 configuration files, and safely
+    #   merge or normalize values coming from system state and desired
+    #   resources.
+    #
+    # None of these methods perform direct catalogue manipulation; they are
+    # focused on idempotent transformation of data so that providers can make
+    # consistent comparisons and updates.
+    # @api public
     module Util
       # Return a merge of the system options and the new options.
       #
