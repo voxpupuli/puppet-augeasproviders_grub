@@ -402,6 +402,8 @@ The following parameters are available in the `kernel_parameter` type.
 
 Valid values: `all`, `default`, `normal`, `recovery`
 
+namevar
+
 Boot mode(s) to apply the parameter to.  Either 'all' (default) to use the parameter on all boots (normal and recovery
 mode), 'default' for just the default boot entry, 'normal' for just normal boots or 'recovery' for just recovery boots.
 
