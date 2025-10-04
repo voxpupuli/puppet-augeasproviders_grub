@@ -9,6 +9,7 @@ Puppet::Type.newtype(:kernel_parameter) do
   @doc = 'Manages kernel parameters stored in bootloaders.'
 
   ensurable do
+    desc 'Whether this kernel parameter should be present on the selected boot entries.'
     defaultvalues
     defaultto :present
   end

@@ -17,6 +17,7 @@ Puppet::Type.newtype(:grub_user) do
   feature :grub2, 'Management of GRUB2 resources'
 
   ensurable do
+    desc 'Whether this GRUB2 user should be present. Set to absent to remove the user definition (and superuser flag if applicable).'
     defaultvalues
     defaultto :present
   end
