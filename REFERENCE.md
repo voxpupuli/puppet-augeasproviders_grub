@@ -25,7 +25,7 @@ The following properties are available in the `grub_config` type.
 
 Valid values: `present`, `absent`
 
-The basic property that the resource should be in.
+Whether the GRUB configuration parameter should be present. Use absent to remove it from the target configuration file.
 
 Default value: `present`
 
@@ -112,7 +112,7 @@ NOTE: You should not use this in conjunction with using the :grub_config
 
 Valid values: `present`, `absent`
 
-The basic property that the resource should be in.
+Whether this GRUB/GRUB2 menu entry should exist. Set to absent to remove the menu entry from the configuration.
 
 Default value: `present`
 
@@ -292,7 +292,7 @@ The following properties are available in the `grub_user` type.
 
 Valid values: `present`, `absent`
 
-The basic property that the resource should be in.
+Whether this GRUB2 user should be present. Set to absent to remove the user definition (and superuser flag if applicable).
 
 Default value: `present`
 
@@ -381,7 +381,7 @@ The following properties are available in the `kernel_parameter` type.
 
 Valid values: `present`, `absent`
 
-The basic property that the resource should be in.
+Whether this kernel parameter should be present on the selected boot entries.
 
 Default value: `present`
 
@@ -401,6 +401,8 @@ The following parameters are available in the `kernel_parameter` type.
 ##### <a name="-kernel_parameter--bootmode"></a>`bootmode`
 
 Valid values: `all`, `default`, `normal`, `recovery`
+
+namevar
 
 Boot mode(s) to apply the parameter to.  Either 'all' (default) to use the parameter on all boots (normal and recovery
 mode), 'default' for just the default boot entry, 'normal' for just normal boots or 'recovery' for just recovery boots.

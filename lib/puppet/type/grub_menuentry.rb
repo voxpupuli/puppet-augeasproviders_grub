@@ -24,6 +24,7 @@ Puppet::Type.newtype(:grub_menuentry) do
   feature :grub2, 'Can handle GRUB2 settings'
 
   ensurable do
+    desc 'Whether this GRUB/GRUB2 menu entry should exist. Set to absent to remove the menu entry from the configuration.'
     defaultvalues
     defaultto :present
   end

@@ -124,6 +124,15 @@ Only recovery mode boots (unsupported with GRUB 2):
       bootmode => "recovery",
     }
 
+#### manage parameter on multiple boot types
+
+    kernel_parameter { 'quiet:all':
+      ensure => absent,
+    }
+    kernel_parameter { 'quiet:recovery':
+      ensure => present,
+    }
+
 #### delete entry
 
     kernel_parameter { "rhgb":

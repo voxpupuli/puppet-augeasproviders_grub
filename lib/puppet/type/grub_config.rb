@@ -11,6 +11,7 @@ Puppet::Type.newtype(:grub_config) do
   @doc = 'Manages global GRUB configuration parameters'
 
   ensurable do
+    desc 'Whether the GRUB configuration parameter should be present. Use absent to remove it from the target configuration file.'
     defaultvalues
     defaultto :present
   end

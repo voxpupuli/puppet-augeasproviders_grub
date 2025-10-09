@@ -1,7 +1,21 @@
 # frozen_string_literal: true
 
+# @summary Top-level namespace for extensions to core Puppet code.
+# @api public
 module PuppetX
+  # @summary Namespace for Augeasproviders GRUB specific helpers.
+  # @api public
   module AugeasprovidersGrub
+    # @summary Collection of pure-Ruby utility methods used by GRUB related
+    #   types and providers in this module. These helpers manipulate kernel
+    #   option arrays, locate and read GRUB2 configuration files, and safely
+    #   merge or normalize values coming from system state and desired
+    #   resources.
+    #
+    # None of these methods perform direct catalogue manipulation; they are
+    # focused on idempotent transformation of data so that providers can make
+    # consistent comparisons and updates.
+    # @api public
     module Util
       # Return a merge of the system options and the new options.
       #
@@ -146,10 +160,21 @@ module PuppetX
         ]
 
         valid_paths = paths.map do |path|
-          real_path = File.realpath(path)
-          real_path if File.readable?(real_path) && !File.directory?(real_path)
-        rescue Errno::ENOENT
-          nil
+          real_path = nil
+
+          if File.readable?(path) && !File.directory?(path)
+            real_path = File.realpath(path)
+
+            # Exclude stub files which include main config (e.g. Debian OS family)
+            File.foreach(real_path) do |line|
+              if line.match(%r{^configfile}s)
+                real_path = nil
+                break
+              end
+            end
+          end
+
+          real_path
         end.compact.uniq
 
         raise(%(No grub configuration found at '#{paths.join("', '")}')) if valid_paths.empty?

@@ -238,6 +238,56 @@ describe provider_class do
       ')
     end
 
+    it 'deletes specific entries' do
+      allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
+
+      apply!(Puppet::Type.type(:kernel_parameter).new(
+               title: 'rhgb:normal',
+               ensure: 'absent',
+               target: target,
+               provider: 'grub2'
+             ))
+
+      augparse_filter(target, LENS, FILTER, '
+        { "GRUB_CMDLINE_LINUX"
+          { "quote" = "\"" }
+          { "value" = "quiet" }
+          { "value" = "elevator=noop" }
+          { "value" = "divider=10" }
+        }
+        { "GRUB_CMDLINE_LINUX_DEFAULT"
+          { "quote" = "\"" }
+          { "value" = "nohz=on" }
+        }
+      ')
+    end
+
+    it 'creates specific entries' do
+      allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
+
+      apply!(Puppet::Type.type(:kernel_parameter).new(
+               title: 'splash:default',
+               ensure: 'present',
+               target: target,
+               provider: 'grub2'
+             ))
+
+      augparse_filter(target, LENS, FILTER, '
+        { "GRUB_CMDLINE_LINUX"
+          { "quote" = "\"" }
+          { "value" = "quiet" }
+          { "value" = "elevator=noop" }
+          { "value" = "divider=10" }
+        }
+        { "GRUB_CMDLINE_LINUX_DEFAULT"
+          { "quote" = "\"" }
+          { "value" = "rhgb" }
+          { "value" = "nohz=on" }
+          { "value" = "splash" }
+        }
+      ')
+    end
+
     describe 'when modifying values' do
       before do
         allow_any_instance_of(provider_class).to receive(:create).and_raise('nope')

@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [Unreleased](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/HEAD)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.2...HEAD)
+
+**Breaking changes:**
+
+- Drop Grub \< 2 remains [\#110](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/110) ([ekohl](https://github.com/ekohl))
+- Drop EoL EL7 support [\#106](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/106) ([bastelfreak](https://github.com/bastelfreak))
+
+**Implemented enhancements:**
+
+- can alter any or all sections of /etc/default/grub by using a Composite namevar [\#120](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/120) ([marcusdots](https://github.com/marcusdots))
+- Add support for Ubuntu 24.04 [\#117](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/117) ([bwitt](https://github.com/bwitt))
+- Add support for EL10 [\#113](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/113) ([michael-riddle](https://github.com/michael-riddle))
+- metadata.json: Add OpenVox [\#109](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/109) ([jstraw](https://github.com/jstraw))
+
+**Fixed bugs:**
+
+- `/boot/efi/EFI/redhat/grub.cfg` incorrectly being updated on EL9 [\#107](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/107)
+- Skip stub grub.cfg files \(e.g. used on Debian OS family\). [\#65](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/65) ([olifre](https://github.com/olifre))
+
+**Closed issues:**
+
+- Support Ubuntu 24.04 [\#116](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/116)
+- Add support for kernel parameters on el10, specifically when determining if the mkconfig command needs --update-bls-cmdline [\#112](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/112)
+- Ubuntu ESP grub.cfg config broken by grub-mkconfig [\#51](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/51)
+- Modify `GRUB_CMDLINE_LINUX` and `GRUB_CMDLINE_LINUX_DEFAULT` [\#23](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/23)
+
+**Merged pull requests:**
+
+- Add some missing docs [\#119](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/119) ([bwitt](https://github.com/bwitt))
+
 ## [v5.1.2](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.2) (2024-08-22)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.1...v5.1.2)
@@ -20,6 +52,10 @@ These should not affect the functionality of the module.
 
 - RHEL \>= 9.3 - `grub2-mkconfig` does not update BLS kernel options anymore per default [\#95](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/95)
 - Update BLS kernel options on EL \>= 9.3 [\#98](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/98) ([silug](https://github.com/silug))
+
+**Merged pull requests:**
+
+- README.md: Add badges + transfer notice [\#102](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/102) ([bastelfreak](https://github.com/bastelfreak))
 
 ## [v5.1.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v5.1.0) (2023-10-30)
 
@@ -133,7 +169,11 @@ These should not affect the functionality of the module.
 
 ## [3.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.0.1) (2018-05-09)
 
-[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.0.0...3.0.1)
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/simp6.0.0-3.0.1...3.0.1)
+
+## [simp6.0.0-3.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/simp6.0.0-3.0.1) (2018-05-09)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/3.0.0...simp6.0.0-3.0.1)
 
 **Closed issues:**
 
@@ -146,16 +186,20 @@ These should not affect the functionality of the module.
 
 ## [3.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.0.0) (2017-08-29)
 
-[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.4.0...3.0.0)
-
-**Closed issues:**
-
-- Unable to set/determine correct provider on Arch Linux [\#22](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/22)
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/simp6.0.0-2.4.0...3.0.0)
 
 **Merged pull requests:**
 
 - Add Global EFI support [\#28](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/28) ([trevor-vaughan](https://github.com/trevor-vaughan))
 - Raise exception on missing augeasproviders\_core [\#25](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/25) ([igalic](https://github.com/igalic))
+
+## [simp6.0.0-2.4.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/simp6.0.0-2.4.0) (2017-01-05)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/2.4.0...simp6.0.0-2.4.0)
+
+**Closed issues:**
+
+- Unable to set/determine correct provider on Arch Linux [\#22](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/22)
 
 ## [2.4.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.4.0) (2016-05-03)
 
