@@ -46,7 +46,7 @@ Puppet::Type.newtype(:kernel_parameter) do
   def self.title_patterns
     [
       [
-        %r{^([^:]+)$},
+        %r{\A([^:]+)\z},
         [
           [:name],
         ],
