@@ -2,6 +2,9 @@
 .github/workflows/ci.yml:
   with:
     additional_packages: libaugeas-dev augeas-tools
+    beaker_hypervisor: vagrant_libvirt
+    acceptance_runs_on: macarne
+    install_vagrant_dependencies: false
 Gemfile:
   optional:
     ':test':
