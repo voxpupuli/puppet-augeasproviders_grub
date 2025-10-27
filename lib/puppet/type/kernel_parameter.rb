@@ -53,7 +53,7 @@ Puppet::Type.newtype(:kernel_parameter) do
         ],
       ],
       [
-        %r{^([^:]+):([^:]+)$},
+        %r{(?u)\A([^:]+):([^:]+)\z},
         [
           [:name],
           [:bootmode],
