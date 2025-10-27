@@ -7,7 +7,7 @@ require 'spec_helper_acceptance'
 
 test_name 'Augeasproviders Grub'
 
-before_manifest=%(
+before_manifest = %(
   kernel_parameter { 'ipv6_disable_all_spelling1':
     name => "ipv6.disable",
     ensure => present,
@@ -24,7 +24,6 @@ before_manifest=%(
     bootmode => 'all',
   }
 )
-
 
 describe 'Kernel Parameter Tests' do
   tests = {
@@ -48,6 +47,7 @@ describe 'Kernel Parameter Tests' do
         before(:context) do
           apply_manifest_on(host, before_manifest)
         end
+
         context "on #{host}" do
           # Using puppet_apply as a helper
           it 'works with without encoding errors' do
