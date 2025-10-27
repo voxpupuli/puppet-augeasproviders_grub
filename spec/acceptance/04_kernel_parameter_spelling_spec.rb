@@ -34,7 +34,7 @@ describe 'Kernel Parameter Tests' do
           name => "ipv6.disable",
           ensure => absent,
           bootmode => 'all',
-        })
+        }),
       test: %(test $(grep -o disable /etc/default/grub   |wc -l ) -eq 2)
     },
   }
