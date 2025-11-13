@@ -232,25 +232,14 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
   def self.instances
     require 'puppetx/augeasproviders_grub/util'
 
-    current_default = nil
-    
-    if grubby_cmd
-      @grubby_default_index ||= (grubby '--default-index').strip
-      current_default = Regexp.last_match(1).delete('"') if (grubby "--info=#{@grubby_default_index}") =~ %r{^\s*title=(.+)\s*$}
-    else
-      # On Debian systems without grubby, get the default from /etc/default/grub
-      begin
-        if File.exist?('/etc/default/grub')
-          grub_default_line = File.read('/etc/default/grub').lines.find { |l| l =~ /^GRUB_DEFAULT=/ }
-          if grub_default_line
-            default_value = grub_default_line.split('=').last.strip.delete('"\'')
-            current_default = default_value unless default_value =~ /^\d+$/
-          end
-        end
-      rescue StandardError => e
-        debug("Could not read default from /etc/default/grub: #{e}")
-      end
-    end
+    current_default = if grubby_cmd
+                        @grubby_default_index ||= (grubby '--default-index').strip
+                        grubby_info = grubby "--info=#{@grubby_default_index}"
+                        Regexp.last_match(1).delete('"') if grubby_info =~ %r{^\s*title=(.+)\s*$}
+                      else
+                        # On Debian systems without grubby, get the default from /etc/default/grub
+                        read_debian_grub_default
+                      end
 
     grub2_menuentries(PuppetX::AugeasprovidersGrub::Util.grub2_cfg, current_default).map { |x| new(x) }
   end
@@ -279,6 +268,19 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
     which('grub2-set-default') || which('grub-set-default') || which('grub-reboot')
   end
 
+  def self.read_debian_grub_default
+    return nil unless File.exist?('/etc/default/grub')
+
+    grub_default_line = File.read('/etc/default/grub').lines.find { |l| l =~ %r{^GRUB_DEFAULT=} }
+    return nil unless grub_default_line
+
+    default_value = grub_default_line.split('=').last.strip.delete('"\'')
+    default_value unless default_value =~ %r{^\d+$}
+  rescue StandardError => e
+    debug("Could not read default from /etc/default/grub: #{e}")
+    nil
+  end
+
   commands grubby: 'grubby' if which('grubby')
   commands grub_set_default: 'grub2-set-default' if which('grub2-set-default') || which('grub-set-default')
 
@@ -294,7 +296,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
 
     @grubby_info = {}
     current_default = nil
-    
+
     if self.class.grubby_cmd
       begin
         @grubby_default_index = (grubby '--default-index').strip
@@ -305,25 +307,14 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
 
           @grubby_info[key.strip] = val.strip.delete('"')
         end
-        
+
         current_default = (@grubby_info['title']) if @grubby_info['title']
       rescue Puppet::ExecutionFailure
         @grubby_info = {}
       end
     else
       # On Debian systems without grubby, get the default from /etc/default/grub
-      begin
-        if File.exist?('/etc/default/grub')
-          grub_default_line = File.read('/etc/default/grub').lines.find { |l| l =~ /^GRUB_DEFAULT=/ }
-          if grub_default_line
-            default_value = grub_default_line.split('=').last.strip.delete('"\'')
-            # If it's a number, we'll match by index later; if it's a name, use it directly
-            current_default = default_value unless default_value =~ /^\d+$/
-          end
-        end
-      rescue StandardError => e
-        debug("Could not read default from /etc/default/grub: #{e}")
-      end
+      current_default = self.class.read_debian_grub_default
     end
 
     # Things that we really only want to do once...
@@ -333,14 +324,14 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
 
     # Extract the default entry for reference later
     @default_entry = menu_entries.select { |x| x[:default_entry] }.first
-    
+
     # On Debian systems, if we couldn't find a default entry by name, try by index
     if !@default_entry && current_default.nil? && menu_entries.any?
       # Default to the first entry if no default is explicitly set
       @default_entry = menu_entries.first
       @default_entry[:default_entry] = true
     end
-    
+
     raise(Puppet::Error, 'Could not find a default GRUB2 entry. Check your system grub configuration') unless @default_entry
 
     @bls_system = (menu_entries.find { |x| x[:bls] } ? true : false)
@@ -611,37 +602,37 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
       PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
     end
 
-    if @property_hash[:default_entry]
-      default_name = (Array(@property_hash[:submenus]) + Array(@property_hash[:name])).compact.join('>').to_s
-      
-      if self.class.grub_set_default_cmd
-        grub_set_default default_name
-      else
-        # On Debian systems, update /etc/default/grub and regenerate config
-        begin
-          require 'tempfile'
-          grub_default_file = '/etc/default/grub'
-          
-          if File.exist?(grub_default_file)
-            content = File.read(grub_default_file)
-            
-            if content =~ /^GRUB_DEFAULT=/
-              content.gsub!(/^GRUB_DEFAULT=.*$/, "GRUB_DEFAULT=\"#{default_name}\"")
-            else
-              content += "\nGRUB_DEFAULT=\"#{default_name}\"\n"
-            end
-            
-            File.write(grub_default_file, content)
-            PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
-          end
-        rescue StandardError => e
-          raise Puppet::Error, "Failed to set default entry: #{e}"
-        end
-      end
+    return unless @property_hash[:default_entry]
+
+    default_name = (Array(@property_hash[:submenus]) + Array(@property_hash[:name])).compact.join('>').to_s
+
+    if self.class.grub_set_default_cmd
+      grub_set_default default_name
+    else
+      update_debian_grub_default(default_name)
     end
   end
 
   private
+
+  def update_debian_grub_default(default_name)
+    # On Debian systems, update /etc/default/grub and regenerate config
+    grub_default_file = '/etc/default/grub'
+    return unless File.exist?(grub_default_file)
+
+    content = File.read(grub_default_file)
+
+    content = if content =~ %r{^GRUB_DEFAULT=}
+                content.gsub(%r{^GRUB_DEFAULT=.*$}, "GRUB_DEFAULT=\"#{default_name}\"")
+              else
+                content + "\nGRUB_DEFAULT=\"#{default_name}\"\n"
+              end
+
+    File.write(grub_default_file, content)
+    PuppetX::AugeasprovidersGrub::Util.grub2_mkconfig(mkconfig)
+  rescue StandardError => e
+    raise Puppet::Error, "Failed to set default entry: #{e}"
+  end
 
   def get_kernel(is, should, grubby_info = @grubby_info)
     new_kernel = should
