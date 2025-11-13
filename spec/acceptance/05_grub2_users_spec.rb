@@ -5,10 +5,13 @@ require 'spec_helper_acceptance'
 test_name 'Augeasproviders Grub'
 
 describe 'GRUB2 User Tests' do
-  let(:target_files) do
+  def target_files(host)
+    os_family = fact_on(host, 'os.family')
+    grub_cfg = os_family == 'Debian' ? '/boot/grub/grub.cfg' : '/etc/grub2.cfg'
+
     [
       '/etc/grub.d/02_puppet_managed_users',
-      '/etc/grub2.cfg'
+      grub_cfg
     ]
   end
 
@@ -52,7 +55,7 @@ describe 'GRUB2 User Tests' do
         end
 
         it 'sets an encrypted password' do
-          target_files.each do |target_file|
+          target_files(host).each do |target_file|
             result = on(host, %(grep 'password_pbkdf2 test_user1' #{target_file})).stdout
 
             _password_identifier, user, password_hash = result.split(%r{\s+})
@@ -81,7 +84,7 @@ describe 'GRUB2 User Tests' do
         end
 
         it 'sets an encrypted password' do
-          target_files.each do |target_file|
+          target_files(host).each do |target_file|
             result = on(host, %(grep 'password_pbkdf2 test_user1' #{target_file})).stdout
 
             _password_identifier, user, password_hash = result.split(%r{\s+})
@@ -111,7 +114,7 @@ describe 'GRUB2 User Tests' do
         end
 
         it 'sets an encrypted password' do
-          target_files.each do |target_file|
+          target_files(host).each do |target_file|
             result = on(host, %(grep 'password_pbkdf2 test_user1' #{target_file})).stdout
 
             _password_identifier, user, password_hash = result.split(%r{\s+})
@@ -146,7 +149,7 @@ describe 'GRUB2 User Tests' do
           result = apply_manifest_on(host, manifest, catch_failures: true).stdout
           expect(result).to match(%r{Purged.*bad_user})
 
-          target_files.each do |target_file|
+          target_files(host).each do |target_file|
             result = on(host, %(grep 'password_pbkdf2 test_user1' #{target_file})).stdout
 
             _password_identifier, user, password_hash = result.split(%r{\s+})

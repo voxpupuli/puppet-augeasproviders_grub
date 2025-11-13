@@ -30,15 +30,42 @@ describe 'GRUB Menuentry Tests' do
         end
 
         it 'has set the default to the new entry' do
-          result = on(host, %(grubby --info=DEFAULT)).stdout
-          result_hash = {}
-          result.each_line do |line|
-            line =~ %r{^\s*(.*?)=(.*)\s*$}
-            result_hash[Regexp.last_match(1).strip] = Regexp.last_match(2).strip
-          end
+          os_family = fact_on(host, 'os.family')
 
-          expect(result_hash['title'].delete('"')).to eq('Standard')
-          expect(result_hash['args'].delete('"')).to include('trogdor=BURNINATE')
+          if os_family == 'Debian'
+            # On Debian, check /boot/grub/grub.cfg for the default entry
+            grub_cfg = on(host, %(cat /boot/grub/grub.cfg)).stdout
+
+            # Find the menuentry blocks
+            menuentry_section = grub_cfg.scan(%r{menuentry '([^']+)'[^{]*{([^}]+)}}m)
+
+            # Get the default entry number from GRUB_DEFAULT
+            default_line = on(host, %(grep '^GRUB_DEFAULT=' /etc/default/grub || echo 'GRUB_DEFAULT=0')).stdout.strip
+            default_value = default_line.split('=').last.strip.delete('"\'')
+
+            # If default is a number, get that menuentry; if it's a name, find it
+            if default_value =~ %r{^\d+$}
+              default_idx = default_value.to_i
+              expect(menuentry_section[default_idx]).not_to be_nil
+              default_entry = menuentry_section[default_idx]
+            else
+              default_entry = menuentry_section.find { |title, _| title == default_value || title.include?('Standard') }
+            end
+
+            expect(default_entry).not_to be_nil
+            expect(default_entry[1]).to include('trogdor=BURNINATE')
+          else
+            # Red Hat-based systems use grubby
+            result = on(host, %(grubby --info=DEFAULT)).stdout
+            result_hash = {}
+            result.each_line do |line|
+              line =~ %r{^\s*(.*?)=(.*)\s*$}
+              result_hash[Regexp.last_match(1).strip] = Regexp.last_match(2).strip
+            end
+
+            expect(result_hash['title'].delete('"')).to eq('Standard')
+            expect(result_hash['args'].delete('"')).to include('trogdor=BURNINATE')
+          end
         end
 
         it 'activates on reboot' do
