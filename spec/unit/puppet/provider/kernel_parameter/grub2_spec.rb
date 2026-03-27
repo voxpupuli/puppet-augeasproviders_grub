@@ -2,12 +2,13 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-provider_class = Puppet::Type.type(:kernel_parameter).provider(:grub2)
 
 LENS = 'Shellvars_list.lns'
 FILTER = "*[label() =~ regexp('GRUB_CMDLINE_LINUX.*')]"
 
-describe provider_class do
+describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
+  let(:provider_class) { Puppet::Type.type(:kernel_parameter).provider(:grub2) }
+
   it 'finds grub2-mkconfig' do
     allow(FileTest).to receive_messages(file?: false, executable?: false)
     allow(FileTest).to receive(:file?).with('/usr/sbin/grub2-mkconfig').and_return(true)
@@ -23,7 +24,9 @@ describe provider_class do
   end
 end
 
-describe provider_class do
+describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
+  let(:provider_class) { Puppet::Type.type(:kernel_parameter).provider(:grub2) }
+
   before do
     allow_any_instance_of(provider_class).to receive(:default?).and_return(true)
     allow(FileTest).to receive_messages(exist?: false, file?: false, executable?: false)
