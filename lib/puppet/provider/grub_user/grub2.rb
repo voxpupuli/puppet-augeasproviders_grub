@@ -267,10 +267,10 @@ Puppet::Type.type(:grub_user).provide(:grub2, parent: Puppet::Type.type(:augeasp
     if output == @property_hash[:_target_file_content]
       err("Please ensure that your *active* GRUB2 configuration is correct. #{self.class} thinks that you need an update, but your file content did not change")
     else
-      fh = File.open(resource[:target], 'w')
-      fh.puts(output)
-      fh.flush
-      fh.close
+      File.open(resource[:target], 'w') do |fh|
+        fh.puts(output)
+        fh.flush
+      end
 
       FileUtils.chmod(0o755, resource[:target])
     end
