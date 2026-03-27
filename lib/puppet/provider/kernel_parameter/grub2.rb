@@ -62,7 +62,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
       # 'normal' and 'default' both map to GRUB_CMDLINE_LINUX_DEFAULT, so only
       # emit 'default' to avoid duplicate resources for the same grub variable.
       sections = { 'all' => 'GRUB_CMDLINE_LINUX',
-                   'default' => 'GRUB_CMDLINE_LINUX_DEFAULT' }
+                   'default' => 'GRUB_CMDLINE_LINUX_DEFAULT', }
       sections.each do |bootmode, key|
         # Get all unique param names
         params = aug.match("$target/#{key}/value").map do |pp|

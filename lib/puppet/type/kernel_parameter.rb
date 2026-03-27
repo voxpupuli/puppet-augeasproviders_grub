@@ -42,7 +42,7 @@ Puppet::Type.newtype(:kernel_parameter) do
   def name
     # 'normal' and 'default' are identical in GRUB2 (both map to
     # GRUB_CMDLINE_LINUX_DEFAULT), so normalize to avoid purge churn.
-    mode = self[:bootmode].to_s == 'normal' ? 'default' : self[:bootmode]
+    mode = (self[:bootmode].to_s == 'normal') ? 'default' : self[:bootmode]
     "#{self[:name]}:#{mode}"
   end
   alias_method :title, :name

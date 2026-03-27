@@ -23,7 +23,7 @@ describe util_class do
         '/etc/grub2-efi.cfg',
         '/boot/efi/EFI/centos/grub.cfg',
         '/boot/grub2/grub.cfg',
-        '/boot/grub/grub.cfg'
+        '/boot/grub/grub.cfg',
       ]
     end
 
@@ -32,8 +32,7 @@ describe util_class do
       allow(described_class).to receive(:os_name).and_return('centos')
 
       # Reset all file system checks
-      allow(File).to receive(:readable?).and_return(false)
-      allow(File).to receive(:directory?).and_return(false)
+      allow(File).to receive_messages(readable?: false, directory?: false)
       allow(File).to receive(:realpath).and_call_original
       allow(File).to receive(:foreach).and_call_original
     end
@@ -42,7 +41,7 @@ describe util_class do
       it 'raises an error' do
         expect { described_class.grub2_cfg_paths }.to raise_error(
           RuntimeError,
-          %r{No grub configuration found at}
+          %r{No grub configuration found at},
         )
       end
     end
@@ -56,11 +55,11 @@ describe util_class do
       context 'and contains regular grub configuration' do
         before do
           # Mock file content without configfile directive
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 configuration file').
-            and_yield('set timeout=5').
-            and_yield('menuentry "Linux" {').
-            and_yield('  linux /vmlinuz').
-            and_yield('}')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 configuration file')
+                                          .and_yield('set timeout=5')
+                                          .and_yield('menuentry "Linux" {')
+                                          .and_yield('  linux /vmlinuz')
+                                          .and_yield('}')
         end
 
         it 'returns the valid config path' do
@@ -71,15 +70,15 @@ describe util_class do
       context 'and contains stub configuration with configfile directive' do
         before do
           # Mock file content with configfile directive (Debian-style stub)
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 stub configuration').
-            and_yield('set prefix=/boot/grub').
-            and_yield('configfile /boot/grub/grub.cfg')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 stub configuration')
+                                          .and_yield('set prefix=/boot/grub')
+                                          .and_yield('configfile /boot/grub/grub.cfg')
         end
 
         it 'excludes the stub file and raises error when no other files exist' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
@@ -87,14 +86,14 @@ describe util_class do
       context 'and contains configfile directive at start of line' do
         before do
           # Mock file content with configfile directive at start of line
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 stub').
-            and_yield('configfile /boot/grub/grub.cfg')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# GRUB2 stub')
+                                          .and_yield('configfile /boot/grub/grub.cfg')
         end
 
         it 'excludes the stub file when configfile is at start of line' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
@@ -115,8 +114,8 @@ describe util_class do
           allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('configfile /boot/grub/grub.cfg')
 
           # Second file is regular config
-          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Regular GRUB config').
-            and_yield('menuentry "Linux" {}')
+          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Regular GRUB config')
+                                          .and_yield('menuentry "Linux" {}')
         end
 
         it 'returns only the non-stub config' do
@@ -127,11 +126,11 @@ describe util_class do
       context 'with multiple regular configs' do
         before do
           # Both files are regular configs
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Regular GRUB config').
-            and_yield('menuentry "Linux" {}')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Regular GRUB config')
+                                          .and_yield('menuentry "Linux" {}')
 
-          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Another regular config').
-            and_yield('set timeout=10')
+          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Another regular config')
+                                          .and_yield('set timeout=10')
         end
 
         it 'returns both configs' do
@@ -151,8 +150,8 @@ describe util_class do
           allow(File).to receive(:realpath).with('/etc/grub2.cfg').and_return('/boot/grub2/grub.cfg')
           allow(File).to receive(:realpath).with('/etc/grub2-efi.cfg').and_return('/boot/grub2/grub.cfg')
 
-          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Real config').
-            and_yield('menuentry "Linux" {}')
+          allow(File).to receive(:foreach).with('/boot/grub2/grub.cfg').and_yield('# Real config')
+                                          .and_yield('menuentry "Linux" {}')
         end
 
         it 'returns unique paths only' do
@@ -174,7 +173,7 @@ describe util_class do
         it 'skips the file' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
@@ -188,7 +187,7 @@ describe util_class do
         it 'skips the directory' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
@@ -204,16 +203,16 @@ describe util_class do
         allow(File).to receive(:realpath).with('/boot/grub/grub.cfg').and_return('/boot/grub/grub.cfg')
 
         # /etc/grub2.cfg is a stub file
-        allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Stub file pointing to real config').
-          and_yield('search --no-floppy --fs-uuid --set=root abcd-efgh').
-          and_yield('configfile ($root)/boot/grub/grub.cfg')
+        allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Stub file pointing to real config')
+                                        .and_yield('search --no-floppy --fs-uuid --set=root abcd-efgh')
+                                        .and_yield('configfile ($root)/boot/grub/grub.cfg')
 
         # /boot/grub/grub.cfg is the real config
-        allow(File).to receive(:foreach).with('/boot/grub/grub.cfg').and_yield('# This file provides configuration for GRUB').
-          and_yield('set timeout=5').
-          and_yield('menuentry "Debian GNU/Linux" {').
-          and_yield('  linux /vmlinuz root=/dev/sda1').
-          and_yield('}')
+        allow(File).to receive(:foreach).with('/boot/grub/grub.cfg').and_yield('# This file provides configuration for GRUB')
+                                        .and_yield('set timeout=5')
+                                        .and_yield('menuentry "Debian GNU/Linux" {')
+                                        .and_yield('  linux /vmlinuz root=/dev/sda1')
+                                        .and_yield('}')
       end
 
       it 'correctly identifies and uses the real config file' do
@@ -229,9 +228,9 @@ describe util_class do
 
       context 'when configfile appears in a comment' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# This file uses configfile directive').
-            and_yield('set timeout=5').
-            and_yield('menuentry "Test" {}')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# This file uses configfile directive')
+                                          .and_yield('set timeout=5')
+                                          .and_yield('menuentry "Test" {}')
         end
 
         it 'does not exclude the file' do
@@ -241,25 +240,25 @@ describe util_class do
 
       context 'when configfile appears at start of line only' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield('  # not configfile at start').
-            and_yield('echo "configfile mentioned here"').
-            and_yield('configfile /real/config')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield('  # not configfile at start')
+                                          .and_yield('echo "configfile mentioned here"')
+                                          .and_yield('configfile /real/config')
         end
 
         it 'excludes the file when configfile is at line start' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
 
       context 'when configfile appears with leading whitespace' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield('  # leading spaces example').
-            and_yield('  configfile /real/config')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield('  # leading spaces example')
+                                          .and_yield('  configfile /real/config')
         end
 
         it 'includes the file when configfile has leading whitespace (not detected as stub)' do
@@ -269,8 +268,8 @@ describe util_class do
 
       context 'when configfile appears with tabs' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield("\tconfigfile /real/config")
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield("\tconfigfile /real/config")
         end
 
         it 'includes the file when configfile has leading tabs (not detected as stub)' do
@@ -280,8 +279,8 @@ describe util_class do
 
       context 'when configfile appears with mixed whitespace' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield(" \t configfile\t/real/config")
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield(" \t configfile\t/real/config")
         end
 
         it 'includes the file when configfile has mixed whitespace (not detected as stub)' do
@@ -301,9 +300,9 @@ describe util_class do
 
       context 'when file contains only comments' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# This is a comment').
-            and_yield('# Another comment').
-            and_yield('# configfile is mentioned here but in comment')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# This is a comment')
+                                          .and_yield('# Another comment')
+                                          .and_yield('# configfile is mentioned here but in comment')
         end
 
         it 'includes the file as valid when configfile only appears in comments' do
@@ -313,9 +312,9 @@ describe util_class do
 
       context 'when configfile is part of another command' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield('echo "Using configfile command"').
-            and_yield('load_configfile_module')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield('echo "Using configfile command"')
+                                          .and_yield('load_configfile_module')
         end
 
         it 'includes the file when configfile is not at start of line' do
@@ -325,9 +324,9 @@ describe util_class do
 
       context 'when configfile has different capitalization' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1').
-            and_yield('ConfigFile /real/config').
-            and_yield('CONFIGFILE /another/config')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set root=hd0,1')
+                                          .and_yield('ConfigFile /real/config')
+                                          .and_yield('CONFIGFILE /another/config')
         end
 
         it 'includes the file when configfile has different case (case-sensitive match)' do
@@ -343,36 +342,36 @@ describe util_class do
         it 'excludes the file when configfile is the only line' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
 
       context 'when multiple configfile directives exist' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Stub file').
-            and_yield('configfile /boot/grub/grub.cfg').
-            and_yield('configfile /another/grub.cfg')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('# Stub file')
+                                          .and_yield('configfile /boot/grub/grub.cfg')
+                                          .and_yield('configfile /another/grub.cfg')
         end
 
         it 'excludes the file on first configfile match' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
 
       context 'when configfile has various arguments' do
         before do
-          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set prefix=/boot/grub').
-            and_yield('configfile ($root)/boot/grub/grub.cfg')
+          allow(File).to receive(:foreach).with('/etc/grub2.cfg').and_yield('set prefix=/boot/grub')
+                                          .and_yield('configfile ($root)/boot/grub/grub.cfg')
         end
 
         it 'excludes the file when configfile has complex arguments' do
           expect { described_class.grub2_cfg_paths }.to raise_error(
             RuntimeError,
-            %r{No grub configuration found at}
+            %r{No grub configuration found at},
           )
         end
       end
@@ -380,8 +379,7 @@ describe util_class do
 
     context 'with different operating system names' do
       before do
-        allow(File).to receive(:readable?).and_return(false)
-        allow(File).to receive(:directory?).and_return(false)
+        allow(File).to receive_messages(readable?: false, directory?: false)
       end
 
       context 'when os_name returns Ubuntu' do
@@ -389,8 +387,8 @@ describe util_class do
           allow(described_class).to receive(:os_name).and_return('Ubuntu')
           allow(File).to receive(:readable?).with('/boot/efi/EFI/ubuntu/grub.cfg').and_return(true)
           allow(File).to receive(:realpath).with('/boot/efi/EFI/ubuntu/grub.cfg').and_return('/boot/efi/EFI/ubuntu/grub.cfg')
-          allow(File).to receive(:foreach).with('/boot/efi/EFI/ubuntu/grub.cfg').and_yield('# Ubuntu GRUB config').
-            and_yield('menuentry "Ubuntu" {}')
+          allow(File).to receive(:foreach).with('/boot/efi/EFI/ubuntu/grub.cfg').and_yield('# Ubuntu GRUB config')
+                                          .and_yield('menuentry "Ubuntu" {}')
         end
 
         it 'includes the Ubuntu-specific EFI path' do
@@ -403,8 +401,8 @@ describe util_class do
           allow(described_class).to receive(:os_name).and_return('')
           allow(File).to receive(:readable?).with('/boot/efi/EFI//grub.cfg').and_return(true)
           allow(File).to receive(:realpath).with('/boot/efi/EFI//grub.cfg').and_return('/boot/efi/EFI//grub.cfg')
-          allow(File).to receive(:foreach).with('/boot/efi/EFI//grub.cfg').and_yield('# Generic EFI config').
-            and_yield('menuentry "Linux" {}')
+          allow(File).to receive(:foreach).with('/boot/efi/EFI//grub.cfg').and_yield('# Generic EFI config')
+                                          .and_yield('menuentry "Linux" {}')
         end
 
         it 'includes the path with empty OS name' do
@@ -419,7 +417,7 @@ describe util_class do
       before do
         allow(described_class).to receive(:grub2_cfg_paths).and_return([
                                                                          '/etc/grub2.cfg',
-                                                                         '/boot/grub2/grub.cfg'
+                                                                         '/boot/grub2/grub.cfg',
                                                                        ])
       end
 
@@ -436,7 +434,7 @@ describe util_class do
       it 'raises an error' do
         expect { described_class.grub2_cfg_path }.to raise_error(
           Puppet::Error,
-          'Could not find a GRUB2 configuration on the system'
+          'Could not find a GRUB2 configuration on the system',
         )
       end
     end
