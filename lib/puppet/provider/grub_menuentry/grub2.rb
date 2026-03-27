@@ -458,9 +458,8 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
     new_module_options = @new_module_options
 
     if Array(new_module_options).empty?
-      new_module_options = []
-      Array(newval).each do |module_set|
-        new_module_options << PuppetX::AugeasprovidersGrub::Util.munged_options([], module_set, @default_entry[:kernel], @default_entry[:kernel_options])
+      new_module_options = Array(newval).map do |module_set|
+        PuppetX::AugeasprovidersGrub::Util.munged_options([], module_set, @default_entry[:kernel], @default_entry[:kernel_options])
       end
     end
 
