@@ -79,7 +79,7 @@ describe provider_class do
                  name: 'foo',
                  ensure: :present,
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -104,7 +104,7 @@ describe provider_class do
                  ensure: :present,
                  value: 'bar',
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -129,7 +129,7 @@ describe provider_class do
                  ensure: :present,
                  value: %w[bar baz],
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -155,7 +155,7 @@ describe provider_class do
                  ensure: :present,
                  bootmode: :normal,
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -180,7 +180,7 @@ describe provider_class do
                  ensure: :present,
                  bootmode: :default,
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -206,7 +206,7 @@ describe provider_class do
                     ensure: :present,
                     bootmode: :recovery,
                     target: target,
-                    provider: 'grub2'
+                    provider: 'grub2',
                   ))
 
       expect(txn.any_failed?).not_to eq nil
@@ -221,7 +221,7 @@ describe provider_class do
                name: 'divider',
                ensure: 'absent',
                target: target,
-               provider: 'grub2'
+               provider: 'grub2',
              ))
 
       augparse_filter(target, LENS, FILTER, '
@@ -245,7 +245,7 @@ describe provider_class do
                title: 'rhgb:normal',
                ensure: 'absent',
                target: target,
-               provider: 'grub2'
+               provider: 'grub2',
              ))
 
       augparse_filter(target, LENS, FILTER, '
@@ -269,7 +269,7 @@ describe provider_class do
                title: 'splash:default',
                ensure: 'present',
                target: target,
-               provider: 'grub2'
+               provider: 'grub2',
              ))
 
       augparse_filter(target, LENS, FILTER, '
@@ -300,7 +300,7 @@ describe provider_class do
                  ensure: :present,
                  value: 'deadline',
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -325,7 +325,7 @@ describe provider_class do
                  ensure: :present,
                  value: 'foo',
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -353,7 +353,7 @@ describe provider_class do
                  ensure: :present,
                  value: %w[noop deadline],
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -377,7 +377,7 @@ describe provider_class do
                  ensure: :present,
                  value: ['deadline'],
                  target: target,
-                 provider: 'grub2'
+                 provider: 'grub2',
                ))
 
         augparse_filter(target, LENS, FILTER, '
@@ -406,7 +406,7 @@ describe provider_class do
                     name: 'foo',
                     ensure: :present,
                     target: target,
-                    provider: 'grub2'
+                    provider: 'grub2',
                   ))
 
       expect(txn.any_failed?).not_to eq nil
