@@ -101,11 +101,11 @@ module PuppetX
         end
 
         # Ensure that we're not duplicating arguments
-        (tmp_results.compact + new_results + appends).
-          flatten.
-          join(' ').
-          scan(%r{\S+=(?:(?:".+?")|(?:\S+))|\S+}).
-          uniq
+        (tmp_results.compact + new_results + appends)
+          .flatten
+          .join(' ')
+          .scan(%r{\S+=(?:(?:".+?")|(?:\S+))|\S+})
+          .uniq
       end
 
       # Take care of copying ':default:' values and ensure that the leading
@@ -156,7 +156,7 @@ module PuppetX
           '/etc/grub2-efi.cfg',
           "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
           '/boot/grub2/grub.cfg',
-          '/boot/grub/grub.cfg'
+          '/boot/grub/grub.cfg',
         ]
 
         valid_paths = paths.map do |path|

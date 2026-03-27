@@ -40,7 +40,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
       if line =~ %r{^\s*menuentry '(.+?)'}
         resource = {
           name: Regexp.last_match(1),
-          bls: false
+          bls: false,
         }
         resource[:default_entry] = (resource[:name] == current_default)
 
@@ -189,7 +189,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
           bls: true,
           bls_target: file,
           puppet_managed: puppet_managed,
-          default_entry: false
+          default_entry: false,
         }
 
         resource[:default_entry] = (resource[:name] == current_default)
@@ -264,7 +264,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
   defaultfor osfamily: :RedHat
 
   def initialize(*args)
-    super(*args)
+    super
 
     require 'puppetx/augeasproviders_grub/util'
 
@@ -282,7 +282,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
       @grubby_info = {}
     end
 
-    current_default = (@grubby_info['title']) if @grubby_info['title']
+    current_default = @grubby_info['title'] if @grubby_info['title']
 
     # Things that we really only want to do once...
     menu_entries = self.class.grub2_menuentries(PuppetX::AugeasprovidersGrub::Util.grub2_cfg, current_default)
@@ -293,7 +293,7 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
     @default_entry = menu_entries.select { |x| x[:default_entry] }.first
     raise(Puppet::Error, 'Could not find a default GRUB2 entry. Check your system grub configuration using `grubby --info=`grubby --default-index``') unless @default_entry
 
-    @bls_system = (menu_entries.find { |x| x[:bls] } ? true : false)
+    @bls_system = ((menu_entries.find { |x| x[:bls] }) ? true : false)
   end
 
   # Prepping material here for use in other functions since this is always
@@ -313,8 +313,8 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2, parent: Puppet::Type.type(:au
     if @property_hash[:bls] || resource[:bls]
       @property_hash[:args] ||= []
     else
-      @property_hash[:load_16bit] ||= resource[:load_16bit].nil? ? true : resource[:load_16bit]
-      @property_hash[:load_video] ||= resource[:load_video].nil? ? true : resource[:load_video]
+      @property_hash[:load_16bit] ||= resource[:load_16bit].nil? || resource[:load_16bit]
+      @property_hash[:load_video] ||= resource[:load_video].nil? || resource[:load_video]
       @property_hash[:plugins] ||= resource[:plugins].nil? ? %w[gzio part_msdos xfs ext2] : resource[:plugins]
     end
 
