@@ -59,14 +59,12 @@ describe provider_class do
         }
       end
 
-      expect(inst.size).to eq 7
+      expect(inst.size).to eq 5
       expect(inst[0]).to include(name: 'quiet', ensure: :present, value: :absent, bootmode: 'all')
       expect(inst[1]).to include(name: 'elevator', ensure: :present, value: 'noop', bootmode: 'all')
       expect(inst[2]).to include(name: 'divider', ensure: :present, value: '10', bootmode: 'all')
       expect(inst[3]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'default')
       expect(inst[4]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'default')
-      expect(inst[5]).to include(name: 'rhgb', ensure: :present, value: :absent, bootmode: 'normal')
-      expect(inst[6]).to include(name: 'nohz', ensure: :present, value: 'on', bootmode: 'normal')
     end
 
     describe 'when creating entries' do

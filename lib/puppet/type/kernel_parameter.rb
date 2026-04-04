@@ -37,6 +37,16 @@ Puppet::Type.newtype(:kernel_parameter) do
     defaultto :all
   end
 
+  # Composite title for `resources { purge => true }` support.
+  # See: https://github.com/puppetlabs/puppetlabs-sshkeys_core/pull/32
+  def name
+    # 'normal' and 'default' are identical in GRUB2 (both map to
+    # GRUB_CMDLINE_LINUX_DEFAULT), so normalize to avoid purge churn.
+    mode = self[:bootmode].to_s == 'normal' ? 'default' : self[:bootmode]
+    "#{self[:name]}:#{mode}"
+  end
+  alias_method :title, :name
+
   autorequire(:file) do
     self[:target]
   end
