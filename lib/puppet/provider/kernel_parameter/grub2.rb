@@ -50,16 +50,20 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     super + 1
   end
 
+  # Composite title for Type.instances to preserve bootmode in resource identity.
+  def title
+    "#{@property_hash[:name]}:#{@property_hash[:bootmode]}"
+  end
+
   def self.instances
     augopen do |aug|
       resources = []
 
-      # Params are nicely separated, but no recovery-only setting (hard-coded)
+      # 'normal' and 'default' both map to GRUB_CMDLINE_LINUX_DEFAULT, so only
+      # emit 'default' to avoid duplicate resources for the same grub variable.
       sections = { 'all' => 'GRUB_CMDLINE_LINUX',
-                   'normal' => 'GRUB_CMDLINE_LINUX_DEFAULT',
                    'default' => 'GRUB_CMDLINE_LINUX_DEFAULT' }
-      sections.keys.sort.each do |bootmode|
-        key = sections[bootmode]
+      sections.each do |bootmode, key|
         # Get all unique param names
         params = aug.match("$target/#{key}/value").map do |pp|
           aug.get(pp).split('=')[0]
