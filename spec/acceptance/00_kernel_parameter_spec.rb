@@ -20,6 +20,28 @@ describe 'Kernel Parameter Tests' do
           bootmode => 'normal'
         }),
       test: %(grep -q "audit=1" /proc/cmdline)
+    },
+    insert_ipv6: {
+      manifest: %(
+        kernel_parameter { 'ipv6.enable':
+          value => '1',
+          ensure => 'present',
+        }
+        kernel_parameter { 'ipv6_enable':
+          value => '1',
+          ensure => 'present',
+        }
+      ),
+      test: 'grep -q ipv6\.enable=1 /proc/commandline '
+    }
+    remove_ignoring_regex {
+      manifest: %(
+        kernel_parameter { 'ipv6.enable':
+          value => '1',
+          ensure => 'absent',
+        }
+      ),
+      test: 'grep -q ipv6_enable=1 /proc/commandline && grep -vq ipv6\.enable=1 /proc/commandline'
     }
   }
 
