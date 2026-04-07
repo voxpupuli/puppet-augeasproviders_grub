@@ -21,7 +21,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     # as of 2026, the dot '.' is the only RegEx-special character allowed in GRUB_CMDLINE_LINUX
     # we will escape all dots, unless they are preceded by backspace
     puts "Debug: Resource name before fix: #{resource[:name]}"
-    regexescape=resource[:name].gsub(  %r|(?<!\\)\.| , '\.')
+    regexescape = resource[:name].gsub(%r{(?<!\\)\.}, '\.')
     puts "Debug: Resource name after fix: #{regexescape}"
     "$target/#{section(resource)}/value[.=~regexp('^#{regexescape}(=.*)?$')]"
   end

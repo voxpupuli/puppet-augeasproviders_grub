@@ -33,8 +33,8 @@ describe 'Kernel Parameter Tests' do
         }
       ),
       test: 'grep -q ipv6\.enable=1 /proc/commandline '
-    }
-    remove_ignoring_regex {
+    },
+    remove_ignoring_regex: {
       manifest: %(
         kernel_parameter { 'ipv6.enable':
           value => '1',
@@ -42,7 +42,7 @@ describe 'Kernel Parameter Tests' do
         }
       ),
       test: 'grep -q ipv6_enable=1 /proc/commandline && grep -vq ipv6\.enable=1 /proc/commandline'
-    }
+    },
   }
 
   tests.each do |name, params|
