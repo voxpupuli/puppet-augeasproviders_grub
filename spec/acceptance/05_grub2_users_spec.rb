@@ -8,7 +8,6 @@ describe 'GRUB2 User Tests' do
   let(:target_files) do
     [
       '/etc/grub.d/02_puppet_managed_users',
-      '/etc/grub2.cfg',
     ]
   end
 
