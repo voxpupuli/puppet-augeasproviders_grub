@@ -58,7 +58,7 @@ describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
         }
       end
 
-      expect(inst.size).to eq 5
+      expect(inst.size).to eq 7
       expect(inst[0]).to include(name: 'quiet', ensure: :present, value: :absent, bootmode: 'all')
       expect(inst[1]).to include(name: 'elevator', ensure: :present, value: 'noop', bootmode: 'all')
       expect(inst[2]).to include(name: 'divider', ensure: :present, value: '10', bootmode: 'all')
