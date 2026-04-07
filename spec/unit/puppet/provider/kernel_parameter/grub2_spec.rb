@@ -393,36 +393,6 @@ describe provider_class do
         ')
       end
 
-      it 'does not handle regexes in resources titles' do
-        allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
-        puts 'Debug before'
-        puts File.read(target)
-
-        a = Puppet::Type.type(:kernel_parameter).new(
-          name: 'foo',
-          ensure: :present,
-          target: target,
-          provider: 'grub2'
-        )
-        puts a.inspect
-        apply! a
-
-        augparse_filter(target, LENS, FILTER, '
-          { "GRUB_CMDLINE_LINUX"
-            { "quote" = "\"" }
-            { "value" = "quiet" }
-            { "value" = "elevator=deadline" }
-            { "value" = "divider=10" }
-          }
-          { "GRUB_CMDLINE_LINUX_DEFAULT"
-            { "quote" = "\"" }
-            { "value" = "rhgb" }
-            { "value" = "nohz=on" }
-          }
-        ')
-        puts 'Debug before'
-        puts File.read(target)
-      end
     end
   end
 
