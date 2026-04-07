@@ -19,8 +19,10 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
     # :name is treated as RegEx
     # ipv6.disable is a very special case. We do not want '.' to be treated as RegEx.
     # as of 2026, the dot '.' is the only RegEx-special character allowed in GRUB_CMDLINE_LINUX
-    # we will escape all dots, unless they are preceded by backspace
     puts "Debug: Resource name before fix: #{resource[:name]}"
+    # we will escape all dots, unless they are preceded by backspace
+    # dont blame this regex on me, blame it on rubocop
+    # gsub( %r@   (?<!\\)   \.   @x , '\.' )
     regexescape = resource[:name].gsub(%r{(?<!\\)\.}, '\.')
     puts "Debug: Resource name after fix: #{regexescape}"
     "$target/#{section(resource)}/value[.=~regexp('^#{regexescape}(=.*)?$')]"
