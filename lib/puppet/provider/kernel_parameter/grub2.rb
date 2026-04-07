@@ -15,7 +15,15 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
   lens { 'Shellvars_list.lns' }
 
   resource_path do |resource|
-    "$target/#{section(resource)}/value[.=~regexp('^#{resource[:name]}(=.*)?$')]"
+    # https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/124
+    # :name is treated as RegEx
+    # ipv6.disable is a very special case. We do not want '.' to be treated as RegEx.
+    # as of 2026, the dot '.' is the only RegEx-special character allowed in GRUB_COMMAND_LINE_LINUX
+    # we will escape all dots, unless they are preceded by backspace
+    puts "Debug: Resource name before fix: #{resource[:name]}"
+    regexescape=resource[:name].gsub(  %r|(?<!\\)\.| , '\.')
+    puts "Debug: Resource name after fix: #{regexescape}"
+    "$target/#{section(resource)}/value[.=~regexp('^#{regexescape}(=.*)?$')]"
   end
 
   def self.mkconfig_path
