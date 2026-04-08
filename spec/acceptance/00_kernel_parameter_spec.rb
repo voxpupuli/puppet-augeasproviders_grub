@@ -11,7 +11,7 @@ describe 'Kernel Parameter Tests' do
         kernel_parameter { 'audit':
           value    => '1'
         }),
-      test: %(grep -q "audit=1" /proc/cmdline)
+      test: %(grep -q "audit=1" /proc/cmdline),
     },
     normal_bootmode: {
       manifest: %(
@@ -19,8 +19,8 @@ describe 'Kernel Parameter Tests' do
           value    => '1',
           bootmode => 'normal'
         }),
-      test: %(grep -q "audit=1" /proc/cmdline)
-    }
+      test: %(grep -q "audit=1" /proc/cmdline),
+    },
   }
 
   tests.each do |name, params|
