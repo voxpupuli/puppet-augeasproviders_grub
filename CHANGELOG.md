@@ -4,17 +4,19 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
-## [Unreleased](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/HEAD)
+## [v6.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v6.0.0) (2026-04-22)
 
-[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.2...HEAD)
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.2...v6.0.0)
 
 **Breaking changes:**
 
+- Drop puppet, update openvox minimum version to 8.19 [\#115](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/115) ([TheMeier](https://github.com/TheMeier))
 - Drop Grub \< 2 remains [\#110](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/110) ([ekohl](https://github.com/ekohl))
 - Drop EoL EL7 support [\#106](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/106) ([bastelfreak](https://github.com/bastelfreak))
 
 **Implemented enhancements:**
 
+- Allow puppet/augeasproviders\_core 5.x [\#133](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/133) ([tuxmaster5000](https://github.com/tuxmaster5000))
 - can alter any or all sections of /etc/default/grub by using a Composite namevar [\#120](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/120) ([marcusdots](https://github.com/marcusdots))
 - Add support for Ubuntu 24.04 [\#117](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/117) ([bwitt](https://github.com/bwitt))
 - Add support for EL10 [\#113](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/113) ([michael-riddle](https://github.com/michael-riddle))
@@ -23,10 +25,14 @@ These should not affect the functionality of the module.
 **Fixed bugs:**
 
 - `/boot/efi/EFI/redhat/grub.cfg` incorrectly being updated on EL9 [\#107](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/107)
+- Bug with kernel\_parameter Puppet 7.28 and Debian 12 [\#94](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/94)
+- Debian 10 - kernel parameter does not work [\#52](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/52)
+- Fix `resources { purge => true }` for `GRUB_CMDLINE_LINUX_DEFAULT` params [\#132](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/132) ([hb0nes](https://github.com/hb0nes))
 - Skip stub grub.cfg files \(e.g. used on Debian OS family\). [\#65](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/65) ([olifre](https://github.com/olifre))
 
 **Closed issues:**
 
+- syntax errors in puppet 8 [\#128](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/128)
 - Support Ubuntu 24.04 [\#116](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/116)
 - Add support for kernel parameters on el10, specifically when determining if the mkconfig command needs --update-bls-cmdline [\#112](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/112)
 - Ubuntu ESP grub.cfg config broken by grub-mkconfig [\#51](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/51)
@@ -182,7 +188,7 @@ These should not affect the functionality of the module.
 **Merged pull requests:**
 
 - Grub2 grub\_user fix [\#32](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/32) ([trevor-vaughan](https://github.com/trevor-vaughan))
-- Update grub2.rb for EFI systems [\#29](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/29) ([cohdjn](https://github.com/cohdjn))
+- Update grub2.rb for EFI systems [\#29](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/29) ([dn89000](https://github.com/dn89000))
 
 ## [3.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/3.0.0) (2017-08-29)
 
@@ -232,7 +238,7 @@ These should not affect the functionality of the module.
 **Merged pull requests:**
 
 - adding 2 defaults for grub 2 [\#17](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/17) ([wanix](https://github.com/wanix))
-- add grub.cfg location for grub2 on UEFI systems [\#16](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/16) ([tedwardia](https://github.com/tedwardia))
+- add grub.cfg location for grub2 on UEFI systems [\#16](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/16) ([theadoria](https://github.com/theadoria))
 - Fix GRUB\_CMDLINE\_LINUX\_DEFAULT [\#14](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/14) ([trevor-vaughan](https://github.com/trevor-vaughan))
 
 ## [2.2.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/2.2.0) (2016-01-04)
