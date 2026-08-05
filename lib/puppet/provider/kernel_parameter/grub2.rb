@@ -39,9 +39,10 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
   def self.mkconfig_cmdline
     os = Facter.value(:os)
     # BLS cmdline option is only needed on RHEL 9.3+
-    # Fedora and Amazon Linux lack support and are excluded
-    # since they don't have a release with major version 9
+    # Fedora and Amazon Linux lack support and are excluded by name, since
+    # their release majors (42, 2023, ...) would otherwise satisfy the >= 10 test
     needs_bls_cmdline = os.is_a?(Hash) && os['family'] == 'RedHat' &&
+                        !%w[Amazon Fedora].include?(os['name']) &&
                         ((os['release']['major'].to_i == 9 && os['release']['minor'].to_i >= 3) || (os['release']['major'].to_i >= 10))
 
     cmdline = [mkconfig_path]
