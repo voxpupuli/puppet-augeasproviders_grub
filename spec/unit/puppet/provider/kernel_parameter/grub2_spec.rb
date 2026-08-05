@@ -22,6 +22,30 @@ describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
     allow(FileTest).to receive(:executable?).with('/usr/sbin/grub-mkconfig').and_return(true)
     expect(provider_class.mkconfig_path).to eq '/usr/sbin/grub-mkconfig'
   end
+
+  describe 'mkconfig_cmdline' do
+    before do
+      allow(FileTest).to receive_messages(file?: false, executable?: false)
+      allow(FileTest).to receive(:file?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+      allow(FileTest).to receive(:executable?).with('/usr/sbin/grub2-mkconfig').and_return(true)
+    end
+
+    {
+      'RHEL 9.2' => [{ 'family' => 'RedHat', 'name' => 'RedHat', 'release' => { 'major' => '9', 'minor' => '2' } }, false],
+      'RHEL 9.3' => [{ 'family' => 'RedHat', 'name' => 'RedHat', 'release' => { 'major' => '9', 'minor' => '3' } }, true],
+      'RHEL 10' => [{ 'family' => 'RedHat', 'name' => 'RedHat', 'release' => { 'major' => '10', 'minor' => '0' } }, true],
+      'Amazon Linux 2023' => [{ 'family' => 'RedHat', 'name' => 'Amazon', 'release' => { 'major' => '2023', 'minor' => '0' } }, false],
+      'Fedora 42' => [{ 'family' => 'RedHat', 'name' => 'Fedora', 'release' => { 'major' => '42', 'minor' => '0' } }, false],
+      'Debian 12' => [{ 'family' => 'Debian', 'name' => 'Debian', 'release' => { 'major' => '12', 'minor' => '0' } }, false],
+    }.each do |os_desc, (os_fact, expected)|
+      it "#{expected ? 'passes' : 'omits'} --update-bls-cmdline on #{os_desc}" do
+        allow(Facter).to receive(:value).with(:os).and_return(os_fact)
+        expected_cmdline = ['/usr/sbin/grub2-mkconfig']
+        expected_cmdline << '--update-bls-cmdline' if expected
+        expect(provider_class.mkconfig_cmdline).to eq expected_cmdline
+      end
+    end
+  end
 end
 
 describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
