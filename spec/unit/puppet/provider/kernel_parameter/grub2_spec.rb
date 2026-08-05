@@ -418,6 +418,86 @@ describe Puppet::Type.type(:kernel_parameter).provider(:grub2) do
     end
   end
 
+  describe 'name_match' do
+    {
+      'quiet' => "[.=~regexp('^quiet(=.*)?$')]",
+      'ipv6.enable' => "[.=~regexp('^ipv6[.]enable(=.*)?$')]",
+      'a.b.c' => "[.=~regexp('^a[.]b[.]c(=.*)?$')]",
+    }.each do |name, expected|
+      it "matches #{name.inspect} with #{expected}" do
+        expect(provider_class.name_match(name)).to eq expected
+      end
+    end
+  end
+
+  context 'with dotted parameter names' do
+    let(:tmptarget) { aug_fixture('dotted') }
+    let(:target) { tmptarget.path }
+
+    before do
+      allow_any_instance_of(provider_class).to receive(:mkconfig).and_return('OK')
+    end
+
+    # instances() drives 'puppet resource' and 'resources { purge => true }', so
+    # an over-matched name reports a value that belongs to a sibling parameter.
+    it 'reports the value of only the exactly named parameter' do
+      allow(provider_class).to receive(:target).and_return(target)
+      inst = provider_class.instances.map { |p| [p.get(:name), p.get(:value)] }
+
+      expect(inst).to include(['ipv6.enable', '1'])
+      expect(inst).to include(%w[ipv6_enable 2])
+      expect(inst).to include(%w[ipv6Xenable 3])
+    end
+
+    it 'changes only the exactly named parameter' do
+      apply!(Puppet::Type.type(:kernel_parameter).new(
+               name: 'ipv6.enable',
+               ensure: :present,
+               value: '9',
+               target: target,
+               provider: 'grub2',
+             ))
+
+      augparse_filter(target, LENS, FILTER, '
+        { "GRUB_CMDLINE_LINUX"
+          { "quote" = "\"" }
+          { "value" = "quiet" }
+          { "value" = "ipv6.enable=9" }
+          { "value" = "ipv6_enable=2" }
+          { "value" = "ipv6Xenable=3" }
+        }
+        { "GRUB_CMDLINE_LINUX_DEFAULT"
+          { "quote" = "\"" }
+          { "value" = "rhgb" }
+          { "value" = "nohz=on" }
+        }
+      ')
+    end
+
+    it 'deletes only the exactly named parameter' do
+      apply!(Puppet::Type.type(:kernel_parameter).new(
+               name: 'ipv6.enable',
+               ensure: 'absent',
+               target: target,
+               provider: 'grub2',
+             ))
+
+      augparse_filter(target, LENS, FILTER, '
+        { "GRUB_CMDLINE_LINUX"
+          { "quote" = "\"" }
+          { "value" = "quiet" }
+          { "value" = "ipv6_enable=2" }
+          { "value" = "ipv6Xenable=3" }
+        }
+        { "GRUB_CMDLINE_LINUX_DEFAULT"
+          { "quote" = "\"" }
+          { "value" = "rhgb" }
+          { "value" = "nohz=on" }
+        }
+      ')
+    end
+  end
+
   context 'with broken file' do
     let(:tmptarget) { aug_fixture('broken') }
     let(:target) { tmptarget.path }

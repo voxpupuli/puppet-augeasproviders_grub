@@ -15,15 +15,18 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
   lens { 'Shellvars_list.lns' }
 
   resource_path do |resource|
-    # https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/124
-    # :name is treated as RegEx
-    # ipv6.disable is a very special case. We do not want '.' to be treated as RegEx.
-    # as of 2026, the dot '.' is the only RegEx-special character allowed in GRUB_CMDLINE_LINUX
-    # we will escape all dots, unless they are preceded by backspace
-    # dont blame this regex on me, blame it on rubocop
-    # gsub( %r@   (?<!\\)   \.   @x , '\.' )
-    regexescape = resource[:name].gsub(%r{(?<!\\)\.}, '\.')
-    "$target/#{section(resource)}/value[.=~regexp('^#{regexescape}(=.*)?$')]"
+    "$target/#{section(resource)}/value#{name_match(resource[:name])}"
+  end
+
+  # Augeas match predicate selecting the value nodes for exactly this parameter,
+  # i.e. '<name>' or '<name>=<anything>'. The dot in a name such as
+  # 'ipv6.disable' must match literally rather than as a regexp wildcard,
+  # otherwise sibling parameters are matched too. Issue #124.
+  #
+  # @param name [String] the parameter name
+  # @return [String] the predicate, including the enclosing brackets
+  def self.name_match(name)
+    "[.=~regexp('^#{name.gsub('.', '[.]')}(=.*)?$')]"
   end
 
   def self.mkconfig_path
@@ -80,7 +83,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, parent: Puppet::Type.type(:
 
         # Find all values for each param name
         params.each do |param|
-          vals = aug.match("$target/#{key}/value[.=~regexp('^#{param}(=.*)?$')]").map do |vp|
+          vals = aug.match("$target/#{key}/value#{name_match(param)}").map do |vp|
             aug.get(vp).split('=', 2)[1]
           end
           vals = vals[0] if vals.size == 1

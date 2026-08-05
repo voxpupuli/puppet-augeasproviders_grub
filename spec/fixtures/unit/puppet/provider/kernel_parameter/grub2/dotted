@@ -1,0 +1,4 @@
+GRUB_TIMEOUT=5
+GRUB_DEFAULT=saved
+GRUB_CMDLINE_LINUX="quiet ipv6.enable=1 ipv6_enable=2 ipv6Xenable=3"
+GRUB_CMDLINE_LINUX_DEFAULT="rhgb nohz=on"
