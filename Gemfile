@@ -3,6 +3,8 @@
 
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
+gem 'beaker-hostgenerator', git: "https://github.com/marcusdots/beaker-hostgenerator.git", branch: "rocky10_oracle10"
+
 group :test do
   gem 'voxpupuli-test', '~> 14.0',  :require => false
   gem 'puppet_metadata', '~> 6.0',  :require => false
@@ -26,4 +28,3 @@ gem 'rake', :require => false
 
 gem 'openvox', ENV.fetch('OPENVOX_GEM_VERSION', [">= 7", "< 9"]), :require => false, :groups => [:test]
 
-# vim: syntax=ruby
