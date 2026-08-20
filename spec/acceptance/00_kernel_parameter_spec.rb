@@ -21,27 +21,27 @@ describe 'Kernel Parameter Tests' do
         }),
       test: %(grep -q "audit=1" /proc/cmdline),
     },
-    insert_ipv6: {
+    # The dot must not act as a wildcard: these two are managed independently.
+    insert_dotted_name: {
       manifest: %(
         kernel_parameter { 'ipv6.enable':
-          value => '1',
           ensure => 'present',
+          value  => '1',
         }
         kernel_parameter { 'ipv6_enable':
-          value => '1',
           ensure => 'present',
+          value  => '2',
         }
       ),
-      test: 'grep -q ipv6\.enable=1 /proc/commandline ',
+      test: %(grep -qF 'ipv6.enable=1' /proc/cmdline && grep -qF 'ipv6_enable=2' /proc/cmdline),
     },
-    remove_ignoring_regex: {
+    remove_dotted_name: {
       manifest: %(
         kernel_parameter { 'ipv6.enable':
-          value => '1',
           ensure => 'absent',
         }
       ),
-      test: 'grep -q ipv6_enable=1 /proc/commandline && grep -vq ipv6\.enable=1 /proc/commandline',
+      test: %(grep -qF 'ipv6_enable=2' /proc/cmdline && ! grep -qF 'ipv6.enable=1' /proc/cmdline),
     },
   }
 
@@ -61,7 +61,7 @@ describe 'Kernel Parameter Tests' do
             apply_manifest_on(host, manifest, catch_changes: true)
           end
 
-          it 'is expected to have auditing enabled at boot time' do
+          it 'is expected to have the parameters applied at boot time' do
             # Scrub out any custom boot entries that were added by other GRUB2
             # tests
             on(host, 'rm -rf /etc/grub.d/05_puppet_managed*')
