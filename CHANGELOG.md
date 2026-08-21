@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v6.0.1](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v6.0.1) (2026-08-21)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v6.0.0...v6.0.1)
+
+**Fixed bugs:**
+
+- Escape dot in `kernel_parameter` names in `self.instances` [\#141](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/141) ([vchepkov](https://github.com/vchepkov))
+- Don't pass `--update-bls-cmdline` on Amazon Linux and Fedora [\#140](https://github.com/voxpupuli/puppet-augeasproviders_grub/pull/140) ([vchepkov](https://github.com/vchepkov))
+
+**Closed issues:**
+
+- Regression: composite `namevar` character replacement [\#124](https://github.com/voxpupuli/puppet-augeasproviders_grub/issues/124)
+
 ## [v6.0.0](https://github.com/voxpupuli/puppet-augeasproviders_grub/tree/v6.0.0) (2026-04-22)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-augeasproviders_grub/compare/v5.1.2...v6.0.0)
