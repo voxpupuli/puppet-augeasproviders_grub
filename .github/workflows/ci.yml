@@ -22,6 +22,7 @@ permissions:
 jobs:
 # stolen from https://github.com/lima-vm/lima-actions
   lima-hypervisor:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: lima-vm/lima-actions/setup@v1
