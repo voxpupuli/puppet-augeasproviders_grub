@@ -3,6 +3,9 @@
 
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
+gem 'beaker-lima', github: 'voxpupuli/beaker-lima', branch: 'beaker_lima_2.3_integration'
+#gem 'beaker-lima', :path => '/home/betadots/working/voxpupuli/github.com_voxpupuli_beaker-lima'
+
 group :test do
   gem 'voxpupuli-test', '~> 14.0',  :require => false
   gem 'puppet_metadata', '~> 6.1',  :require => false

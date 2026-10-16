@@ -423,4 +423,3 @@ usually discover the appropriate provider for your platform.
 ##### <a name="-kernel_parameter--target"></a>`target`
 
 The bootloader configuration file, if in a non-default location for the provider.
-
