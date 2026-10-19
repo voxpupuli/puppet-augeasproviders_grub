@@ -1,3 +1,4 @@
+# augeasproviders workflow/ci.yaml
 ---
 # Managed by modulesync - DO NOT EDIT
 # https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
@@ -20,8 +21,28 @@ permissions:
   contents: read
 
 jobs:
+# stolen from https://github.com/lima-vm/lima-actions
+  lima-hypervisor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lima-vm/lima-actions/setup@v1
+        id: lima-actions-setup
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/lima
+          key: lima-${{ steps.lima-actions-setup.outputs.version }}
+      - run: limactl start --plain --name=default --cpus=1 --memory=1 template://fedora
+      - run: rsync -a -e ssh . lima-default:/tmp/repo
+      - run: ssh lima-default ls -l /tmp/repo
   puppet:
     name: Puppet
-    uses: voxpupuli/gha-puppet/.github/workflows/basic.yml@v4
+    uses: marcusdots/gha-puppet/.github/workflows/beaker.yml@beaker_lima_2.3_integration
     with:
       additional_packages: 'libaugeas-dev augeas-tools'
+      beaker_hypervisor: 'lima'
+      timeout_minutes: 15
+      
+
+env:
+  BEAKER_HYPERVISOR: lima
