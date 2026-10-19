@@ -1,3 +1,4 @@
+# augeasproviders workflow/ci.yaml
 ---
 # Managed by modulesync - DO NOT EDIT
 # https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
@@ -36,10 +37,12 @@ jobs:
       - run: ssh lima-default ls -l /tmp/repo
   puppet:
     name: Puppet
+    timeout-minutes: 30
     uses: marcusdots/gha-puppet/.github/workflows/beaker.yml@beaker_lima_2.3_integration
     with:
       additional_packages: 'libaugeas-dev augeas-tools'
       beaker_hypervisor: 'lima'
+      
 
 env:
   BEAKER_HYPERVISOR: lima

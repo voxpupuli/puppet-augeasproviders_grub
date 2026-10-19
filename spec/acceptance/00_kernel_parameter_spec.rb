@@ -52,6 +52,8 @@ describe 'Kernel Parameter Tests' do
 
       hosts.each do |host|
         context "on #{host}" do
+          shell("echo debugmarker")
+          shell("cat /etc/os-release")
           # Using puppet_apply as a helper
           it 'works with no errors' do
             apply_manifest_on(host, manifest, catch_failures: true)
